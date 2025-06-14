@@ -173,7 +173,7 @@
                     <p>Intel & Apple Silicon</p>
                     <a href="#" class="download-btn" onclick="downloadMac()">Download for Mac</a>
                     <div class="command-box">
-                        curl -fsSL https://flutter-setup.com/mac | bash
+                        curl -L -o flutter-setup-macos https://github.com/Joynul-Abedin/Flutter-Pod/releases/download/v1.0.0/flutter-setup-macos && chmod +x flutter-setup-macos && ./flutter-setup-macos
                     </div>
                 </div>
                 
@@ -182,7 +182,7 @@
                     <p>Ubuntu, Debian & derivatives</p>
                     <a href="#" class="download-btn" onclick="downloadLinux()">Download for Linux</a>
                     <div class="command-box">
-                        curl -fsSL https://flutter-setup.com/linux | bash
+                        curl -L -o flutter-setup-linux https://github.com/Joynul-Abedin/Flutter-Pod/releases/download/v1.0.0/flutter-setup-linux && chmod +x flutter-setup-linux && ./flutter-setup-linux
                     </div>
                 </div>
                 
@@ -191,7 +191,7 @@
                     <p>Windows 10/11 PowerShell</p>
                     <a href="#" class="download-btn" onclick="downloadWindows()">Download for Windows</a>
                     <div class="command-box">
-                        iwr https://flutter-setup.com/win -useb | iex
+                        Invoke-WebRequest -Uri "https://github.com/Joynul-Abedin/Flutter-Pod/releases/download/v1.0.0/flutter-setup-windows.exe" -OutFile "flutter-setup-windows.exe"; .\flutter-setup-windows.exe
                     </div>
                 </div>
             </div>
@@ -211,7 +211,7 @@
             });
             
             // Trigger download
-            window.location.href = 'https://your-cdn.com/executables/flutter-setup-macos';
+            window.location.href = 'https://github.com/Joynul-Abedin/Flutter-Pod/releases/download/v1.0.0/flutter-setup-macos';
         }
         
         function downloadLinux() {
@@ -219,7 +219,7 @@
                 'platform': 'linux'
             });
             
-            window.location.href = 'https://your-cdn.com/executables/flutter-setup-linux';
+            window.location.href = 'https://github.com/Joynul-Abedin/Flutter-Pod/releases/download/v1.0.0/flutter-setup-linux';
         }
         
         function downloadWindows() {
@@ -227,7 +227,7 @@
                 'platform': 'windows'
             });
             
-            window.location.href = 'https://your-cdn.com/executables/flutter-setup-windows.exe';
+            window.location.href = 'https://github.com/Joynul-Abedin/Flutter-Pod/releases/download/v1.0.0/flutter-setup-windows.exe';
         }
         
         // Auto-detect platform and highlight
