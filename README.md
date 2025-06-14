@@ -1,277 +1,158 @@
-# 🚀 Intelligent Flutter Environment Setup
+# 🚀 Flutter Environment Setup Scripts
 
-Cross-platform Flutter development environment setup scripts with AI-powered error recovery.
+Cross-platform Flutter development environment setup with AI-powered error recovery.
 
 ## 🌟 Features
 
-- **Cross-Platform Support**: macOS (Intel & Apple Silicon), Linux (Ubuntu/Debian), Windows
-- **Latest Flutter**: Automatically installs the latest stable Flutter version
-- **Smart Dependencies**: Installs all required tools and SDKs
-- **Zero-Config AI Recovery**: Built-in DeepSeek AI integration (no API key setup required)
-- **Unified Progress Bar**: Fixed bottom progress bar with clean output separation
-- **Intelligent Detection**: Skips already installed components
-- **Self-healing Installation**: Automatic retry with AI-guided fixes for failed components
-- **Professional UI**: Clean terminal interface with persistent progress tracking
-
-## 📋 Prerequisites
-
-### System Requirements
-- **macOS**: macOS 10.14+ (Homebrew will be installed automatically)
-- **Linux**: Ubuntu 18.04+ or Debian-based distribution with `sudo` access
-- **Windows**: Windows 10+ with PowerShell 5.1+
+- **🔥 One-Click Setup**: Complete Flutter environment installation
+- **🤖 AI Error Recovery**: Built-in intelligent troubleshooting (no API key needed)
+- **📊 Progress Tracking**: Professional progress bar with clean output
+- **🌍 Cross-Platform**: Works on macOS, Linux, and Windows
+- **⚡ Smart Detection**: Skips already installed components
+- **🛡️ Self-Healing**: Automatic retry with AI-guided fixes
 
 ## 🚀 Quick Start
 
 ### macOS & Linux
 
 ```bash
-# Download and run the script
+# Download and run
 curl -fsSL https://raw.githubusercontent.com/Joynul-Abedin/Flutter-Pod/main/setup_flutter_env.sh | bash
 
 # Or download first, then run
-wget https://raw.githubusercontent.com/Joynul-Abedin/Flutter-Pod/main/setup_flutter_env.sh
+curl -O https://raw.githubusercontent.com/Joynul-Abedin/Flutter-Pod/main/setup_flutter_env.sh
 chmod +x setup_flutter_env.sh
 ./setup_flutter_env.sh
 ```
 
-### Windows
+### Windows PowerShell
 
 ```powershell
-# Download and run the script
+# Download and run
 Invoke-WebRequest -Uri "https://raw.githubusercontent.com/Joynul-Abedin/Flutter-Pod/main/setup_flutter_env.ps1" -OutFile "setup_flutter_env.ps1"
 .\setup_flutter_env.ps1
 
-# Or run with parameters
-.\setup_flutter_env.ps1 -FlutterPath "C:\Dev\flutter" -NoAI
-```
-
-## 📖 Detailed Usage
-
-### Bash Script (macOS/Linux) Options
-
-The bash script automatically detects your system and runs the appropriate installation steps:
-
-```bash
-# Basic installation with built-in AI error recovery
-./setup_flutter_env.sh
-```
-
-### PowerShell Script (Windows) Options
-
-```powershell
-# Basic installation
-.\setup_flutter_env.ps1
-
-# Custom Flutter installation path
-.\setup_flutter_env.ps1 -FlutterPath "C:\Dev\flutter"
-
-# Disable AI error recovery
-.\setup_flutter_env.ps1 -NoAI
-
-# Run as Administrator (recommended)
-# Right-click PowerShell -> "Run as Administrator"
-.\setup_flutter_env.ps1
+# Run as Administrator for best results
 ```
 
 ## 🛠️ What Gets Installed
 
-### All Platforms
-- ✅ Git
-- ✅ curl/wget
-- ✅ unzip utilities
-- ✅ Java JDK 11
+### Core Components (All Platforms)
+- ✅ Git version control
+- ✅ Java JDK 11+
 - ✅ Latest stable Flutter SDK
 - ✅ Flutter PATH configuration
-- ✅ Flutter precache (web, mobile targets)
+- ✅ Development dependencies
 
-### macOS Specific
-- ✅ Homebrew (if not installed)
-- ✅ CocoaPods
-- ✅ Ruby (if needed for CocoaPods)
-- ✅ Xcode license acceptance (if Xcode installed)
+### Platform-Specific
+- **macOS**: Homebrew, CocoaPods, Xcode tools
+- **Linux**: APT packages, Flutter dependencies
+- **Windows**: Chocolatey, development tools
 
-### Linux Specific
-- ✅ APT package updates
-- ✅ Linux-specific Flutter dependencies (libglu1-mesa, etc.)
+## 🎯 AI-Powered Smart Installation
 
-### Windows Specific
-- ✅ Chocolatey package manager
-- ✅ 7-Zip for archives
-- ✅ Windows-specific PATH handling
+The scripts include intelligent error recovery that automatically:
 
-## 🎯 Unified Progress Bar System
+1. **Detects Issues**: Identifies installation failures
+2. **Consults AI**: Uses DeepSeek AI for problem analysis
+3. **Applies Fixes**: Automatically resolves dependency issues
+4. **Continues Setup**: Seamlessly resumes installation
 
-Experience professional installation feedback with our innovative progress tracking:
-
-- **🔒 Fixed Position**: Progress bar always remains at the bottom of your terminal
-- **📊 Real-time Updates**: Live percentage completion with current step description
-- **📝 Clean Logs**: All installation output appears above the progress bar
-- **📏 Dynamic Width**: Automatically adjusts to your terminal size
-- **🎨 Visual Clarity**: Clear separation between logs and progress tracking
-
-This creates a clean, professional installation experience where you can easily follow both the detailed logs and overall progress simultaneously.
-
-## 🤖 Smart AI-Powered Installation
-
-The scripts provide intelligent, self-healing installation with automatic dependency resolution:
-
-### **Unified Progress Bar System**
-- 📊 **Fixed Bottom Bar**: Progress bar stays permanently at the bottom of terminal
-- 📈 **Clean Output**: All installation logs and output appear above the progress bar
-- 🎯 **Real-time Updates**: Live completion percentage with current step details
-- 🔄 **Dynamic Resizing**: Automatically adapts to terminal width for optimal display
-- ⚡ **Professional Experience**: No more scattered progress messages throughout output
-
-### **Automatic AI Error Recovery**
-1. **Detect Issues**: Automatically detects package installation failures
-2. **AI Analysis**: Consults DeepSeek AI with specific error context and system info
-3. **Smart Fixes**: Receives and auto-executes dependency resolution commands
-4. **Seamless Retry**: Continues installation after fixing dependencies
-5. **Fallback Support**: Interactive mode if auto-fixes need confirmation
-
-### **Visual Progress Experience**
+### Visual Progress Experience
 ```
 🚀     Intelligent Flutter Environment Setup Script             🚀
 🚀     Powered by AI Error Recovery (DeepSeek)                  🚀
 
-ℹ️  🖥️  System Information: macOS 15.3.2 (arm64)
+ℹ️  🖥️  System: macOS 15.3.2 (arm64)
 ✅ 🤖 AI Error Recovery: Enabled
 
-ℹ️  Installing basic dependencies
-✅ git already installed
-✅ wget already installed
-ℹ️  Installing Java JDK
-✅ Java already installed: 21.0.7
-
-────────────────────────────────────────────────────────────────────────────────
-📊 [███████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 37% - Installing CocoaPods
+────────────────────────────────────────────────────────────────
+📊 [███████████░░░░░░░░░░░░░░░░░░░] 37% - Installing Flutter SDK
 ```
 
-### **Example Smart Recovery**
-```
-ℹ️  Installing Ruby dependencies...
-❌ Ruby installation failed: missing development tools
-🤖 Consulting AI... (attempt 1/3)
-🔄 Retrying after AI fix...
-✅ Dependencies resolved, continuing installation...
+## 📋 Requirements
 
-────────────────────────────────────────────────────────────────────────────────
-📊 [██████████████████░░░░░░░░░░░░░░░░░░░░░░░░] 62% - Configuring Flutter
-```
+- **macOS**: macOS 10.14+ 
+- **Linux**: Ubuntu 18.04+ or Debian-based with sudo access
+- **Windows**: Windows 10+ with PowerShell 5.1+
 
-### **Smart Dependency Resolution**
-The system automatically handles complex dependency chains:
+## 🔧 Usage Options
 
-- **Ruby Installation**: Auto-installs development tools and build dependencies
-- **Java Setup**: Handles JDK linking and PATH configuration issues
-- **CocoaPods**: Resolves gem conflicts and Ruby version compatibility
-- **Flutter SDK**: Manages extraction, permissions, and PATH setup issues
-- **Package Managers**: Fixes Homebrew, Chocolatey, and APT repository issues
-
-## 📁 File Structure
-
-```
-├── setup_flutter_env.sh     # macOS/Linux setup script
-├── setup_flutter_env.ps1    # Windows PowerShell script
-├── README.md                # This documentation
-├── .gitignore              # Git ignore rules
-└── .cursorrules            # Development notes and lessons learned
+### Bash Script (macOS/Linux)
+```bash
+./setup_flutter_env.sh
 ```
 
-## 🔧 Troubleshooting
+### PowerShell Script (Windows)
+```powershell
+# Basic installation
+.\setup_flutter_env.ps1
 
-### Common Issues
+# Custom Flutter path
+.\setup_flutter_env.ps1 -FlutterPath "C:\Dev\flutter"
 
-#### macOS
-- **Xcode License**: Run `sudo xcodebuild -license accept`
-- **Homebrew Permissions**: Fix with `sudo chown -R $(whoami) /opt/homebrew`
-- **CocoaPods**: Run `gem install cocoapods --user-install`
+# Disable AI assistance
+.\setup_flutter_env.ps1 -NoAI
+```
 
-#### Linux
-- **Permissions**: Ensure your user has `sudo` access
-- **Missing Dependencies**: The script handles most cases automatically
-- **Android Studio**: Install manually for Android development
+## 🚦 After Installation
 
-#### Windows
-- **Execution Policy**: Run `Set-ExecutionPolicy RemoteSigned -Scope CurrentUser`
-- **Admin Rights**: Run PowerShell as Administrator for system-wide PATH
-- **Antivirus**: Temporarily disable if blocking downloads
-
-### Manual Flutter Installation
-
-If the automatic installation fails, you can install Flutter manually:
-
-1. Download Flutter from https://flutter.dev/docs/get-started/install
-2. Extract to your preferred location
-3. Add `flutter/bin` to your PATH
-4. Run `flutter doctor` to verify
-
-## 🚦 Post-Installation
-
-After running the setup script:
-
-1. **Restart your terminal** or source your shell configuration:
+1. **Restart your terminal** or reload shell:
    ```bash
-   # macOS/Linux
-   source ~/.zshrc  # or ~/.bashrc
+   source ~/.zshrc  # macOS/Linux
    ```
 
 2. **Verify installation**:
    ```bash
    flutter --version
-   flutter doctor -v
+   flutter doctor
    ```
 
-3. **Create your first app**:
+3. **Create your first Flutter app**:
    ```bash
-   flutter create my_awesome_app
-   cd my_awesome_app
+   flutter create my_app
+   cd my_app
    flutter run
    ```
 
-## 🧪 Testing the Scripts
+## 🔧 Troubleshooting
 
-To test the scripts in different environments:
+### Common Solutions
 
-### Using Docker (Linux simulation)
-```bash
-# Test Ubuntu setup
-docker run -it --rm ubuntu:22.04 bash
-# ... install curl, then run the script
+**macOS Issues:**
+- Xcode license: `sudo xcodebuild -license accept`
+- Homebrew permissions: `sudo chown -R $(whoami) /opt/homebrew`
 
-# Test Debian setup  
-docker run -it --rm debian:bullseye bash
-# ... install curl, then run the script
-```
+**Linux Issues:**
+- Ensure sudo access for package installation
+- Script handles most dependency issues automatically
 
-### Using Virtual Machines
-- **macOS**: Test on different macOS versions
-- **Windows**: Test on Windows 10/11 with different PowerShell versions
+**Windows Issues:**
+- Set execution policy: `Set-ExecutionPolicy RemoteSigned -Scope CurrentUser`
+- Run PowerShell as Administrator
+
+### Manual Flutter Installation
+
+If automatic setup fails:
+1. Download Flutter from https://flutter.dev/docs/get-started/install
+2. Extract to preferred location
+3. Add `flutter/bin` to PATH
+4. Run `flutter doctor`
+
+## 📁 Repository Contents
+
+- `setup_flutter_env.sh` - macOS/Linux setup script
+- `setup_flutter_env.ps1` - Windows PowerShell script
+- `README.md` - This documentation
 
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Test your changes on multiple platforms
-4. Submit a pull request
+Found an issue? Please open an issue or submit a pull request.
 
-### Development Notes
+## 📄 License
 
-- Error handling improvements are tracked in `.cursorrules`
-- AI prompts can be refined for better error recovery
-- Platform-specific edge cases should be documented
-
-## 📝 License
-
-MIT License - feel free to use and modify these scripts for your projects.
-
-## 🙏 Acknowledgments
-
-- Flutter team for the excellent framework
-- OpenRouter for AI API access
-- DeepSeek for intelligent error analysis
-- Homebrew, Chocolatey, and APT maintainers
+MIT License - feel free to use and modify as needed.
 
 ---
 
-**Happy Flutter Development! 🎯✨** 
+**⚡ Get Flutter development ready in minutes, not hours!** 
