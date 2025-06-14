@@ -7,11 +7,11 @@ Cross-platform Flutter development environment setup scripts with AI-powered err
 - **Cross-Platform Support**: macOS (Intel & Apple Silicon), Linux (Ubuntu/Debian), Windows
 - **Latest Flutter**: Automatically installs the latest stable Flutter version
 - **Smart Dependencies**: Installs all required tools and SDKs
-- **Smart AI-Powered Installation**: Automatic dependency resolution with DeepSeek AI (no API key required)
-- **Unified Progress Bar**: Fixed progress bar at bottom of terminal with all output above
+- **Zero-Config AI Recovery**: Built-in DeepSeek AI integration (no API key setup required)
+- **Unified Progress Bar**: Fixed bottom progress bar with clean output separation
 - **Intelligent Detection**: Skips already installed components
 - **Self-healing Installation**: Automatic retry with AI-guided fixes for failed components
-- **Beautiful UI**: Colorful terminal output with emojis and clear progress indicators
+- **Professional UI**: Clean terminal interface with persistent progress tracking
 
 ## 📋 Prerequisites
 
@@ -26,10 +26,10 @@ Cross-platform Flutter development environment setup scripts with AI-powered err
 
 ```bash
 # Download and run the script
-curl -fsSL https://raw.githubusercontent.com/your-repo/flutter-setup/main/setup_flutter_env.sh | bash
+curl -fsSL https://raw.githubusercontent.com/Joynul-Abedin/Flutter-Pod/main/setup_flutter_env.sh | bash
 
 # Or download first, then run
-wget https://raw.githubusercontent.com/your-repo/flutter-setup/main/setup_flutter_env.sh
+wget https://raw.githubusercontent.com/Joynul-Abedin/Flutter-Pod/main/setup_flutter_env.sh
 chmod +x setup_flutter_env.sh
 ./setup_flutter_env.sh
 ```
@@ -38,7 +38,7 @@ chmod +x setup_flutter_env.sh
 
 ```powershell
 # Download and run the script
-Invoke-WebRequest -Uri "https://raw.githubusercontent.com/your-repo/flutter-setup/main/setup_flutter_env.ps1" -OutFile "setup_flutter_env.ps1"
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/Joynul-Abedin/Flutter-Pod/main/setup_flutter_env.ps1" -OutFile "setup_flutter_env.ps1"
 .\setup_flutter_env.ps1
 
 # Or run with parameters
@@ -99,16 +99,28 @@ The bash script automatically detects your system and runs the appropriate insta
 - ✅ 7-Zip for archives
 - ✅ Windows-specific PATH handling
 
+## 🎯 Unified Progress Bar System
+
+Experience professional installation feedback with our innovative progress tracking:
+
+- **🔒 Fixed Position**: Progress bar always remains at the bottom of your terminal
+- **📊 Real-time Updates**: Live percentage completion with current step description
+- **📝 Clean Logs**: All installation output appears above the progress bar
+- **📏 Dynamic Width**: Automatically adjusts to your terminal size
+- **🎨 Visual Clarity**: Clear separation between logs and progress tracking
+
+This creates a clean, professional installation experience where you can easily follow both the detailed logs and overall progress simultaneously.
+
 ## 🤖 Smart AI-Powered Installation
 
 The scripts provide intelligent, self-healing installation with automatic dependency resolution:
 
 ### **Unified Progress Bar System**
-- 📊 Fixed progress bar always visible at bottom of terminal
-- 📈 All installation output and logs appear above the progress bar
-- 🎯 Real-time completion percentage with current step indication
-- 🎯 Clear indication of current installation step
-- ⏱️ Real-time feedback during each component installation
+- 📊 **Fixed Bottom Bar**: Progress bar stays permanently at the bottom of terminal
+- 📈 **Clean Output**: All installation logs and output appear above the progress bar
+- 🎯 **Real-time Updates**: Live completion percentage with current step details
+- 🔄 **Dynamic Resizing**: Automatically adapts to terminal width for optimal display
+- ⚡ **Professional Experience**: No more scattered progress messages throughout output
 
 ### **Automatic AI Error Recovery**
 1. **Detect Issues**: Automatically detects package installation failures
@@ -117,14 +129,34 @@ The scripts provide intelligent, self-healing installation with automatic depend
 4. **Seamless Retry**: Continues installation after fixing dependencies
 5. **Fallback Support**: Interactive mode if auto-fixes need confirmation
 
+### **Visual Progress Experience**
+```
+🚀     Intelligent Flutter Environment Setup Script             🚀
+🚀     Powered by AI Error Recovery (DeepSeek)                  🚀
+
+ℹ️  🖥️  System Information: macOS 15.3.2 (arm64)
+✅ 🤖 AI Error Recovery: Enabled
+
+ℹ️  Installing basic dependencies
+✅ git already installed
+✅ wget already installed
+ℹ️  Installing Java JDK
+✅ Java already installed: 21.0.7
+
+────────────────────────────────────────────────────────────────────────────────
+📊 [███████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 37% - Installing CocoaPods
+```
+
 ### **Example Smart Recovery**
 ```
-📊 [██████░░░░░░░░░░░░░░░░░░░░░░░░░░] 60% - Installing Ruby
+ℹ️  Installing Ruby dependencies...
 ❌ Ruby installation failed: missing development tools
-🤖 Consulting AI for error resolution...
-🔄 Auto-applying AI suggestion: installing Xcode Command Line Tools
-✅ Dependencies resolved, retrying Ruby installation
-✅ Ruby installed successfully, continuing to CocoaPods...
+🤖 Consulting AI... (attempt 1/3)
+🔄 Retrying after AI fix...
+✅ Dependencies resolved, continuing installation...
+
+────────────────────────────────────────────────────────────────────────────────
+📊 [██████████████████░░░░░░░░░░░░░░░░░░░░░░░░] 62% - Configuring Flutter
 ```
 
 ### **Smart Dependency Resolution**

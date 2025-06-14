@@ -1,0 +1,7 @@
+docs: Update README with unified progress bar system and correct repository URLs
+
+- Add dedicated section explaining the unified progress bar system
+- Update repository URLs to use correct GitHub path (Joynul-Abedin/Flutter-Pod)
+- Enhance visual examples showing the new progress bar experience
+- Improve feature descriptions for professional installation UI
+- Add detailed explanation of clean output separation and dynamic resizing 
