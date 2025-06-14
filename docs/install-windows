@@ -1,0 +1,16 @@
+# Flutter Setup for Windows
+$repo = "Joynul-Abedin/Flutter-Pod"
+$version = "v1.0.0"
+$downloadUrl = "https://github.com/$repo/releases/download/$version/flutter-setup-windows.exe"
+$tempFile = "$env:TEMP\flutter-setup-windows.exe"
+
+Write-Host "🪟 Downloading Flutter Setup for Windows..." -ForegroundColor Cyan
+Invoke-WebRequest -Uri $downloadUrl -OutFile $tempFile
+
+Write-Host "🚀 Running Flutter Setup..." -ForegroundColor Green
+& $tempFile
+
+Write-Host "🧹 Cleaning up..." -ForegroundColor Yellow
+Remove-Item -Path $tempFile -Force -ErrorAction SilentlyContinue
+
+Write-Host "✅ Flutter setup completed!" -ForegroundColor Green

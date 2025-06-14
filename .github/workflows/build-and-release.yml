@@ -1,0 +1,94 @@
+name: Build and Release Flutter Setup
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up environment
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y shc
+        
+    - name: Build executables
+      run: |
+        # Build macOS executable (cross-compile)
+        shc -f setup_flutter_env.sh -o flutter-setup-macos
+        
+        # Build Linux executable
+        shc -f setup_flutter_env.sh -o flutter-setup-linux
+        
+        # For Windows, we'll use the PowerShell script directly
+        cp setup_flutter_env.ps1 flutter-setup-windows.ps1
+        
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Flutter Setup ${{ github.ref }}
+        body: |
+          🚀 Flutter Environment Setup - Professional Installation
+          
+          ## Download for your platform:
+          - **macOS**: Download `flutter-setup-macos`
+          - **Linux**: Download `flutter-setup-linux`  
+          - **Windows**: Download `flutter-setup-windows.ps1`
+          
+          ## One-liner installation:
+          ```bash
+          # macOS/Linux
+          curl -fsSL https://joynul-abedin.github.io/Flutter-Pod/install-mac | bash
+          
+          # Windows
+          iwr https://joynul-abedin.github.io/Flutter-Pod/install-windows -useb | iex
+          ```
+          
+          ## Features:
+          - ✅ AI-powered error recovery
+          - ✅ Unified progress bar
+          - ✅ Cross-platform support
+          - ✅ Zero configuration required
+        draft: false
+        prerelease: false
+        
+    - name: Upload macOS Binary
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./flutter-setup-macos
+        asset_name: flutter-setup-macos
+        asset_content_type: application/octet-stream
+        
+    - name: Upload Linux Binary
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./flutter-setup-linux
+        asset_name: flutter-setup-linux
+        asset_content_type: application/octet-stream
+        
+    - name: Upload Windows Script
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./flutter-setup-windows.ps1
+        asset_name: flutter-setup-windows.ps1
+        asset_content_type: text/plain

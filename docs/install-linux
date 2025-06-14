@@ -1,0 +1,19 @@
+#!/bin/bash
+set -e
+
+REPO="Joynul-Abedin/Flutter-Pod"
+VERSION="v1.0.0"
+DOWNLOAD_URL="https://github.com/${REPO}/releases/download/${VERSION}/flutter-setup-linux"
+TEMP_FILE="/tmp/flutter-setup-linux"
+
+echo "🐧 Downloading Flutter Setup for Linux..."
+curl -fsSL "$DOWNLOAD_URL" -o "$TEMP_FILE"
+chmod +x "$TEMP_FILE"
+
+echo "🚀 Running Flutter Setup..."
+"$TEMP_FILE"
+
+echo "🧹 Cleaning up..."
+rm -f "$TEMP_FILE"
+
+echo "✅ Flutter setup completed!"
