@@ -7,15 +7,11 @@ Cross-platform Flutter development environment setup scripts with AI-powered err
 - **Cross-Platform Support**: macOS (Intel & Apple Silicon), Linux (Ubuntu/Debian), Windows
 - **Latest Flutter**: Automatically installs the latest stable Flutter version
 - **Smart Dependencies**: Installs all required tools and SDKs
-- **AI Error Recovery**: Uses DeepSeek AI to analyze and suggest fixes for setup errors
+- **Built-in AI Error Recovery**: Uses DeepSeek AI to analyze and suggest fixes for setup errors (no API key required)
 - **Intelligent Detection**: Skips already installed components
 - **Beautiful UI**: Colorful terminal output with emojis and clear progress indicators
 
 ## 📋 Prerequisites
-
-### For AI Error Recovery (Optional)
-- OpenRouter API key for DeepSeek access
-- Set environment variable: `export OPENROUTER_API_KEY="your-api-key"`
 
 ### System Requirements
 - **macOS**: macOS 10.14+ (Homebrew will be installed automatically)
@@ -54,8 +50,7 @@ Invoke-WebRequest -Uri "https://raw.githubusercontent.com/your-repo/flutter-setu
 The bash script automatically detects your system and runs the appropriate installation steps:
 
 ```bash
-# Enable AI error recovery (recommended)
-export OPENROUTER_API_KEY="your-api-key"
+# Basic installation with built-in AI error recovery
 ./setup_flutter_env.sh
 ```
 
@@ -102,12 +97,12 @@ export OPENROUTER_API_KEY="your-api-key"
 - ✅ 7-Zip for archives
 - ✅ Windows-specific PATH handling
 
-## 🤖 AI Error Recovery
+## 🤖 Built-in AI Error Recovery
 
-When an error occurs during setup, the scripts can automatically:
+When an error occurs during setup, the scripts automatically:
 
 1. **Capture Error Context**: Logs the error, current step, and system information
-2. **Consult DeepSeek AI**: Sends error details to DeepSeek for analysis
+2. **Consult DeepSeek AI**: Sends error details to DeepSeek for analysis (no API key needed)
 3. **Suggest Solutions**: Provides specific commands or actions to resolve the issue
 4. **Interactive Recovery**: Asks if you want to apply the AI suggestion
 
@@ -131,7 +126,8 @@ The Homebrew installation might be incomplete. Try running:
 ├── setup_flutter_env.sh     # macOS/Linux setup script
 ├── setup_flutter_env.ps1    # Windows PowerShell script
 ├── README.md                # This documentation
-└── .cursorrules             # Development notes and lessons learned
+├── .gitignore              # Git ignore rules
+└── .cursorrules            # Development notes and lessons learned
 ```
 
 ## 🔧 Troubleshooting

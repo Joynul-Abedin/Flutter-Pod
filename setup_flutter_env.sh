@@ -47,7 +47,7 @@ log_step() {
 # =============================================================================
 # 🤖 AI ERROR HANDLING
 # =============================================================================
-OPENROUTER_API_KEY="${OPENROUTER_API_KEY:-}"
+OPENROUTER_API_KEY="${OPENROUTER_API_KEY:-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}"
 ERROR_LOG_FILE="/tmp/flutter_setup_errors.log"
 
 ask_ai_for_help() {
@@ -56,7 +56,7 @@ ask_ai_for_help() {
     local os_info="$3"
     
     if [[ -z "$OPENROUTER_API_KEY" ]]; then
-        log_warning "OPENROUTER_API_KEY not set. Skipping AI error recovery."
+        log_warning "AI API key not available. Skipping AI error recovery."
         return 1
     fi
     
@@ -476,11 +476,7 @@ main() {
     log_info "🖥️  System Information: $(get_os_info)"
     echo
     
-    if [[ -n "$OPENROUTER_API_KEY" ]]; then
-        log_success "🤖 AI Error Recovery: Enabled"
-    else
-        log_warning "🤖 AI Error Recovery: Disabled (set OPENROUTER_API_KEY to enable)"
-    fi
+    log_success "🤖 AI Error Recovery: Enabled"
     echo
     
     # Initialize error log

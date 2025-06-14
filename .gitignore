@@ -2,9 +2,8 @@
 # 🚀 Flutter Setup Scripts - Git Ignore Configuration
 # =============================================================================
 
-# Environment and configuration files containing API keys
+# Environment and configuration files
 .env
-config
 *.env
 *.local
 

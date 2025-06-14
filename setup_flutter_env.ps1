@@ -58,7 +58,7 @@ function Write-LogStep {
 # =============================================================================
 # 🤖 AI ERROR HANDLING
 # =============================================================================
-$script:OpenRouterApiKey = $env:OPENROUTER_API_KEY
+$script:OpenRouterApiKey = if ($env:OPENROUTER_API_KEY) { $env:OPENROUTER_API_KEY } else { "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" }
 $script:ErrorLogFile = "$env:TEMP\flutter_setup_errors.log"
 $script:CurrentStep = "Unknown step"
 
@@ -69,8 +69,8 @@ function Invoke-AIErrorRecovery {
         [string]$OSInfo
     )
     
-    if ([string]::IsNullOrEmpty($script:OpenRouterApiKey) -or $NoAI) {
-        Write-LogWarning "OPENROUTER_API_KEY not set or AI disabled. Skipping AI error recovery."
+    if ($NoAI) {
+        Write-LogWarning "AI error recovery disabled by NoAI flag. Skipping AI error recovery."
         return $false
     }
     
@@ -439,8 +439,8 @@ function Main {
             Write-LogWarning "🔑 Not running as Administrator (some features may be limited)"
         }
         
-        if ([string]::IsNullOrEmpty($script:OpenRouterApiKey) -or $NoAI) {
-            Write-LogWarning "🤖 AI Error Recovery: Disabled"
+        if ($NoAI) {
+            Write-LogWarning "🤖 AI Error Recovery: Disabled (NoAI flag set)"
         } else {
             Write-LogSuccess "🤖 AI Error Recovery: Enabled"
         }
