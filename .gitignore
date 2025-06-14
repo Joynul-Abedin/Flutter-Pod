@@ -1,0 +1,47 @@
+# =============================================================================
+# 🚀 Flutter Setup Scripts - Git Ignore Configuration
+# =============================================================================
+
+# Environment and configuration files containing API keys
+.env
+config
+*.env
+*.local
+
+# Temporary files and logs
+*.log
+*.tmp
+/tmp/
+.temp/
+
+# macOS specific files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows specific files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux specific files
+.Trash-*
+
+# Editor and IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Test files and results
+test_results/
+coverage/
+
+# Backup files
+*.bak
+*.backup
+
+# Personal notes and scratch files
+notes.txt
+scratch.md 
