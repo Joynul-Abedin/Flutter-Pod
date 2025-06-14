@@ -7,8 +7,10 @@ Cross-platform Flutter development environment setup scripts with AI-powered err
 - **Cross-Platform Support**: macOS (Intel & Apple Silicon), Linux (Ubuntu/Debian), Windows
 - **Latest Flutter**: Automatically installs the latest stable Flutter version
 - **Smart Dependencies**: Installs all required tools and SDKs
-- **Built-in AI Error Recovery**: Uses DeepSeek AI to analyze and suggest fixes for setup errors (no API key required)
+- **Smart AI-Powered Installation**: Automatic dependency resolution with DeepSeek AI (no API key required)
+- **Real-time Progress Tracking**: Visual progress bar showing installation completion
 - **Intelligent Detection**: Skips already installed components
+- **Self-healing Installation**: Automatic retry with AI-guided fixes for failed components
 - **Beautiful UI**: Colorful terminal output with emojis and clear progress indicators
 
 ## 📋 Prerequisites
@@ -97,28 +99,40 @@ The bash script automatically detects your system and runs the appropriate insta
 - ✅ 7-Zip for archives
 - ✅ Windows-specific PATH handling
 
-## 🤖 Built-in AI Error Recovery
+## 🤖 Smart AI-Powered Installation
 
-When an error occurs during setup, the scripts automatically:
+The scripts provide intelligent, self-healing installation with automatic dependency resolution:
 
-1. **Capture Error Context**: Logs the error, current step, and system information
-2. **Consult DeepSeek AI**: Sends error details to DeepSeek for analysis (no API key needed)
-3. **Suggest Solutions**: Provides specific commands or actions to resolve the issue
-4. **Interactive Recovery**: Asks if you want to apply the AI suggestion
+### **Real-time Progress Tracking**
+- 📊 Visual progress bar showing completion percentage
+- 🎯 Clear indication of current installation step
+- ⏱️ Real-time feedback during each component installation
 
-### Example AI Interaction
+### **Automatic AI Error Recovery**
+1. **Detect Issues**: Automatically detects package installation failures
+2. **AI Analysis**: Consults DeepSeek AI with specific error context and system info
+3. **Smart Fixes**: Receives and auto-executes dependency resolution commands
+4. **Seamless Retry**: Continues installation after fixing dependencies
+5. **Fallback Support**: Interactive mode if auto-fixes need confirmation
 
+### **Example Smart Recovery**
 ```
-❌ Error occurred at line 245: brew install openjdk@11
+📊 Progress: [██████░░░░] 60% - Installing Ruby
+❌ Ruby installation failed: missing development tools
 🤖 Consulting AI for error resolution...
-🤖 AI Suggestion:
-The Homebrew installation might be incomplete. Try running:
-1. brew doctor
-2. brew update
-3. brew install openjdk@11
-
-🤔 Do you want to try the AI suggestion? (y/n): y
+🔄 Auto-applying AI suggestion: installing Xcode Command Line Tools
+✅ Dependencies resolved, retrying Ruby installation
+✅ Ruby installed successfully, continuing to CocoaPods...
 ```
+
+### **Smart Dependency Resolution**
+The system automatically handles complex dependency chains:
+
+- **Ruby Installation**: Auto-installs development tools and build dependencies
+- **Java Setup**: Handles JDK linking and PATH configuration issues
+- **CocoaPods**: Resolves gem conflicts and Ruby version compatibility
+- **Flutter SDK**: Manages extraction, permissions, and PATH setup issues
+- **Package Managers**: Fixes Homebrew, Chocolatey, and APT repository issues
 
 ## 📁 File Structure
 
