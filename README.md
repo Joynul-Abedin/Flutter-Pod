@@ -8,7 +8,7 @@ Cross-platform Flutter development environment setup scripts with AI-powered err
 - **Latest Flutter**: Automatically installs the latest stable Flutter version
 - **Smart Dependencies**: Installs all required tools and SDKs
 - **Smart AI-Powered Installation**: Automatic dependency resolution with DeepSeek AI (no API key required)
-- **Real-time Progress Tracking**: Visual progress bar showing installation completion
+- **Unified Progress Bar**: Fixed progress bar at bottom of terminal with all output above
 - **Intelligent Detection**: Skips already installed components
 - **Self-healing Installation**: Automatic retry with AI-guided fixes for failed components
 - **Beautiful UI**: Colorful terminal output with emojis and clear progress indicators
@@ -103,8 +103,10 @@ The bash script automatically detects your system and runs the appropriate insta
 
 The scripts provide intelligent, self-healing installation with automatic dependency resolution:
 
-### **Real-time Progress Tracking**
-- 📊 Visual progress bar showing completion percentage
+### **Unified Progress Bar System**
+- 📊 Fixed progress bar always visible at bottom of terminal
+- 📈 All installation output and logs appear above the progress bar
+- 🎯 Real-time completion percentage with current step indication
 - 🎯 Clear indication of current installation step
 - ⏱️ Real-time feedback during each component installation
 
@@ -117,7 +119,7 @@ The scripts provide intelligent, self-healing installation with automatic depend
 
 ### **Example Smart Recovery**
 ```
-📊 Progress: [██████░░░░] 60% - Installing Ruby
+📊 [██████░░░░░░░░░░░░░░░░░░░░░░░░░░] 60% - Installing Ruby
 ❌ Ruby installation failed: missing development tools
 🤖 Consulting AI for error resolution...
 🔄 Auto-applying AI suggestion: installing Xcode Command Line Tools

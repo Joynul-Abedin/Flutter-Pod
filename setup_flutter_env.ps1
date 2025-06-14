@@ -56,10 +56,74 @@ function Write-LogStep {
 }
 
 # =============================================================================
-# 📊 PROGRESS TRACKING
+# 📊 UNIFIED PROGRESS BAR SYSTEM
 # =============================================================================
 $script:TotalSteps = 6
 $script:CurrentProgress = 0
+$script:CurrentStepName = ""
+$script:OriginalCursorPosition = @{ X = 0; Y = 0 }
+
+function Initialize-ProgressBar {
+    # Clear screen and initialize
+    Clear-Host
+    
+    # Set up initial progress bar
+    Draw-ProgressBar -StepName "Initializing Flutter Setup..." -Percentage 0
+}
+
+function Cleanup-ProgressBar {
+    # Move cursor to bottom and add final newline
+    try {
+        $consoleHeight = [Console]::WindowHeight
+        [Console]::SetCursorPosition(0, $consoleHeight - 1)
+        Write-Host ""
+    }
+    catch {
+        Write-Host ""
+    }
+}
+
+function Draw-ProgressBar {
+    param(
+        [string]$StepName,
+        [int]$Percentage
+    )
+    
+    try {
+        # Save current cursor position
+        $script:OriginalCursorPosition = @{
+            X = [Console]::CursorLeft
+            Y = [Console]::CursorTop
+        }
+        
+        # Get console dimensions
+        $consoleWidth = [Console]::WindowWidth
+        $consoleHeight = [Console]::WindowHeight
+        
+        # Calculate bar width (leave space for text)
+        $barWidth = [math]::Max(20, $consoleWidth - 25)
+        $filledLength = [math]::Round($Percentage * $barWidth / 100)
+        $bar = "█" * $filledLength + "░" * ($barWidth - $filledLength)
+        
+        # Move to bottom line
+        [Console]::SetCursorPosition(0, $consoleHeight - 1)
+        
+        # Clear the line and draw progress bar
+        $progressText = "📊 [$bar] $Percentage% - $StepName"
+        if ($progressText.Length -gt $consoleWidth) {
+            $progressText = $progressText.Substring(0, $consoleWidth - 1)
+        }
+        
+        Write-Host $progressText -ForegroundColor $Colors.Cyan -NoNewline
+        
+        # Restore cursor position
+        [Console]::SetCursorPosition($script:OriginalCursorPosition.X, $script:OriginalCursorPosition.Y)
+    }
+    catch {
+        # Fallback to simple progress display
+        Write-Host "📊 Progress: $Percentage% - $StepName" -ForegroundColor $Colors.Cyan
+    }
+}
 
 function Update-Progress {
     param([string]$StepName)
@@ -67,12 +131,16 @@ function Update-Progress {
     $script:CurrentProgress++
     $percentage = [math]::Round(($script:CurrentProgress * 100) / $script:TotalSteps)
     
-    # Create progress bar
-    $barLength = 30
-    $filledLength = [math]::Round($percentage * $barLength / 100)
-    $bar = "█" * $filledLength + "░" * ($barLength - $filledLength)
+    $script:CurrentStepName = $StepName
+    Draw-ProgressBar -StepName $StepName -Percentage $percentage
+}
+
+function Update-ProgressText {
+    param([string]$StepName)
     
-    Write-Host "📊 Progress: [$bar] $percentage% - $StepName" -ForegroundColor $Colors.Cyan
+    $percentage = [math]::Round(($script:CurrentProgress * 100) / $script:TotalSteps)
+    $script:CurrentStepName = $StepName
+    Draw-ProgressBar -StepName $StepName -Percentage $percentage
 }
 
 # =============================================================================
@@ -100,7 +168,7 @@ function Invoke-AIErrorRecovery {
     try {
         # Create JSON payload
         $payload = @{
-            model = "deepseek/deepseek-chat"
+            model = "deepseek/deepseek-chat-v3-0324:free"
             messages = @(
                 @{
                     role = "system"
@@ -178,6 +246,7 @@ function Invoke-CommandWithAIRetry {
     $currentRetry = 0
     
     while ($currentRetry -lt $MaxRetries) {
+        Update-ProgressText "Executing: $Description"
         Write-LogInfo "Executing: $Description"
         
         try {
@@ -189,16 +258,20 @@ function Invoke-CommandWithAIRetry {
             $errorMessage = $_.Exception.Message
             
             if ($currentRetry -lt $MaxRetries) {
+                Update-ProgressText "🤖 Consulting AI... (attempt $currentRetry/$MaxRetries)"
                 Write-LogWarning "Command failed (attempt $currentRetry/$MaxRetries). Consulting AI..."
                 
                 if (Invoke-AIErrorRecovery -ErrorMessage $errorMessage -CurrentStep $Description -OSInfo (Get-OSInfo) -AutoApply $true) {
+                    Update-ProgressText "🔄 Retrying after AI fix..."
                     Write-LogInfo "🔄 Retrying after AI fix..."
                     continue
                 } else {
+                    Update-ProgressText "⚠️ AI couldn't resolve issue, retrying..."
                     Write-LogWarning "AI couldn't resolve the issue. Retrying..."
                     Start-Sleep -Seconds 2
                 }
             } else {
+                Update-ProgressText "❌ Failed after $MaxRetries attempts"
                 Write-LogError "Command failed after $MaxRetries attempts: $Description"
                 throw $_
             }
@@ -438,10 +511,6 @@ function Invoke-HealthCheck {
     Write-Host "================================" -ForegroundColor $Colors.White
     Write-Host ""
     
-    # Complete progress bar
-    Update-Progress "Installation complete"
-    Write-Host ""
-    
     Write-LogSuccess "🎉 Flutter environment setup completed successfully!"
     
     # Show next steps
@@ -465,7 +534,9 @@ function Invoke-HealthCheck {
 # =============================================================================
 function Main {
     try {
-        Write-Host ""
+        # Initialize progress bar system
+        Initialize-ProgressBar
+        
         Write-Host "🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀" -ForegroundColor $Colors.Cyan
         Write-Host "🚀                                                              🚀" -ForegroundColor $Colors.Cyan
         Write-Host "🚀     Intelligent Flutter Environment Setup Script             🚀" -ForegroundColor $Colors.Cyan
@@ -499,9 +570,18 @@ function Main {
         Initialize-Flutter
         Invoke-HealthCheck
         
+        # Final completion
+        Draw-ProgressBar -StepName "🎉 Installation completed successfully!" -Percentage 100
+        Start-Sleep -Seconds 2
+        
+        # Cleanup progress bar
+        Cleanup-ProgressBar
+        
         Write-LogSuccess "🎉 Flutter environment setup completed successfully!"
     }
     catch {
+        # Cleanup progress bar on error
+        Cleanup-ProgressBar
         Write-LogError "Setup failed: $_"
         Write-LogInfo "Check the error log at: $script:ErrorLogFile"
         exit 1

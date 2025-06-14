@@ -45,30 +45,95 @@ log_step() {
 }
 
 # =============================================================================
-# 📊 PROGRESS TRACKING
+# 📊 UNIFIED PROGRESS BAR SYSTEM
 # =============================================================================
 TOTAL_STEPS=8
 CURRENT_PROGRESS=0
+CURRENT_STEP_NAME=""
+PROGRESS_LINE=""
 
+# Initialize progress bar
+init_progress_bar() {
+    # Save terminal state
+    tput smcup 2>/dev/null || true
+    
+    # Hide cursor
+    tput civis 2>/dev/null || true
+    
+    # Clear screen and set up initial progress bar
+    clear
+    draw_progress_bar "Initializing Flutter Setup..." 0
+}
+
+# Cleanup progress bar
+cleanup_progress_bar() {
+    # Show cursor
+    tput cnorm 2>/dev/null || true
+    
+    # Restore terminal state
+    tput rmcup 2>/dev/null || true
+    
+    echo # Final newline
+}
+
+# Draw progress bar at bottom of terminal
+draw_progress_bar() {
+    local step_name="$1"
+    local percentage="$2"
+    
+    # Save current cursor position
+    tput sc 2>/dev/null || true
+    
+    # Get terminal dimensions
+    local terminal_height=$(tput lines 2>/dev/null || echo "24")
+    local terminal_width=$(tput cols 2>/dev/null || echo "80")
+    
+    # Calculate bar width (leave space for text and brackets)
+    local bar_width=$((terminal_width - 25))
+    if [[ $bar_width -lt 20 ]]; then
+        bar_width=20
+    fi
+    
+    local filled_length=$((percentage * bar_width / 100))
+    local bar=""
+    
+    # Create progress bar
+    for ((i=0; i<filled_length; i++)); do
+        bar+="█"
+    done
+    
+    for ((i=filled_length; i<bar_width; i++)); do
+        bar+="░"
+    done
+    
+    # Move to bottom line
+    tput cup $((terminal_height - 1)) 0 2>/dev/null || true
+    
+    # Clear the line and draw progress bar
+    tput el 2>/dev/null || true
+    printf "${CYAN}📊 [${bar}] ${percentage}%% - ${step_name}${NC}"
+    
+    # Restore cursor position
+    tput rc 2>/dev/null || true
+}
+
+# Update progress and redraw bar
 update_progress() {
     local step_name="$1"
     CURRENT_PROGRESS=$((CURRENT_PROGRESS + 1))
     local percentage=$((CURRENT_PROGRESS * 100 / TOTAL_STEPS))
     
-    # Create progress bar
-    local bar_length=30
-    local filled_length=$((percentage * bar_length / 100))
-    local bar=""
+    CURRENT_STEP_NAME="$step_name"
+    draw_progress_bar "$step_name" "$percentage"
+}
+
+# Update progress without incrementing (for sub-steps)
+update_progress_text() {
+    local step_name="$1"
+    local percentage=$((CURRENT_PROGRESS * 100 / TOTAL_STEPS))
     
-    for ((i=0; i<filled_length; i++)); do
-        bar+="█"
-    done
-    
-    for ((i=filled_length; i<bar_length; i++)); do
-        bar+="░"
-    done
-    
-    echo -e "${CYAN}📊 Progress: [${bar}] ${percentage}% - ${step_name}${NC}"
+    CURRENT_STEP_NAME="$step_name"
+    draw_progress_bar "$step_name" "$percentage"
 }
 
 # =============================================================================
@@ -93,7 +158,7 @@ ask_ai_for_help() {
     # Create JSON payload
     local payload=$(cat <<EOF
 {
-    "model": "deepseek/deepseek-chat",
+    "model": "deepseek/deepseek-chat-v3-0324:free",
     "messages": [
         {
             "role": "system",
@@ -171,6 +236,7 @@ execute_with_ai_retry() {
     local current_retry=0
     
     while [[ $current_retry -lt $max_retries ]]; do
+        update_progress_text "Executing: $description"
         log_info "Executing: $description"
         
         if eval "$command"; then
@@ -180,19 +246,23 @@ execute_with_ai_retry() {
             current_retry=$((current_retry + 1))
             
             if [[ $current_retry -lt $max_retries ]]; then
+                update_progress_text "🤖 Consulting AI... (attempt $current_retry/$max_retries)"
                 log_warning "Command failed (attempt $current_retry/$max_retries). Consulting AI..."
                 
                 # Get the last few lines of error output
                 local error_context=$(eval "$command" 2>&1 | tail -10)
                 
                 if ask_ai_for_help "$error_context" "$description" "$(get_os_info)" "true"; then
+                    update_progress_text "🔄 Retrying after AI fix..."
                     log_info "🔄 Retrying after AI fix..."
                     continue
                 else
+                    update_progress_text "⚠️ AI couldn't resolve issue, retrying..."
                     log_warning "AI couldn't resolve the issue. Retrying..."
                     sleep 2
                 fi
             else
+                update_progress_text "❌ Failed after $max_retries attempts"
                 log_error "Command failed after $max_retries attempts: $description"
                 return $exit_code
             fi
@@ -537,10 +607,6 @@ run_health_check() {
     echo "================================"
     echo
     
-    # Complete progress bar
-    update_progress "Installation complete"
-    echo
-    
     log_success "🎉 Flutter environment setup completed successfully!"
     
     # Show next steps
@@ -565,7 +631,12 @@ run_health_check() {
 # 🚀 MAIN EXECUTION
 # =============================================================================
 main() {
-    echo
+    # Initialize progress bar system
+    init_progress_bar
+    
+    # Set up trap for cleanup
+    trap cleanup_progress_bar EXIT
+    
     echo "🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀"
     echo "🚀                                                              🚀"
     echo "🚀     Intelligent Flutter Environment Setup Script             🚀"
@@ -591,6 +662,11 @@ main() {
     configure_flutter
     run_health_check
     
+    # Final completion
+    draw_progress_bar "🎉 Installation completed successfully!" 100
+    sleep 2
+    
+    # Cleanup will be called by trap
     log_success "🎉 Flutter environment setup completed successfully!"
 }
 
