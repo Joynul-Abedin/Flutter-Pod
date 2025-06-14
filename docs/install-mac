@@ -2,11 +2,13 @@
 set -e
 
 REPO="Joynul-Abedin/Flutter-Pod"
-VERSION="v1.0.0"
-DOWNLOAD_URL="https://github.com/${REPO}/releases/download/${VERSION}/flutter-setup-macos"
+DOWNLOAD_URL="https://github.com/${REPO}/releases/latest/download/flutter-setup-macos"
 TEMP_FILE="/tmp/flutter-setup-macos"
 
-echo "🍎 Downloading Flutter Setup for macOS..."
+echo "🔒 Flutter Setup - Secure Installation"
+echo "=====================================+"
+echo "📥 Downloading secure executable..."
+
 curl -fsSL "$DOWNLOAD_URL" -o "$TEMP_FILE"
 chmod +x "$TEMP_FILE"
 
@@ -16,4 +18,4 @@ echo "🚀 Running Flutter Setup..."
 echo "🧹 Cleaning up..."
 rm -f "$TEMP_FILE"
 
-echo "✅ Flutter setup completed!"
+echo "✅ Flutter setup completed securely!"

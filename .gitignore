@@ -44,3 +44,21 @@ coverage/
 # Personal notes and scratch files
 notes.txt
 scratch.md 
+# =============================================================================
+# 🔒 SOURCE CODE PROTECTION
+# =============================================================================
+# Prevent accidental exposure of script files in docs/
+docs/*.sh
+docs/*.ps1
+docs/scripts/
+docs/src/
+
+# Protect distribution source files
+dist/src/
+dist/scripts/
+*.sh.original
+*.ps1.original
+
+# Temporary build files
+*.x.c
+build-temp/

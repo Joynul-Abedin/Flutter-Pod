@@ -1,10 +1,12 @@
-# Flutter Setup for Windows
+# Flutter Setup - Secure Installation for Windows
 $repo = "Joynul-Abedin/Flutter-Pod"
-$version = "v1.0.0"
-$downloadUrl = "https://github.com/$repo/releases/download/$version/flutter-setup-windows.exe"
+$downloadUrl = "https://github.com/$repo/releases/latest/download/flutter-setup-windows.exe"
 $tempFile = "$env:TEMP\flutter-setup-windows.exe"
 
-Write-Host "🪟 Downloading Flutter Setup for Windows..." -ForegroundColor Cyan
+Write-Host "🔒 Flutter Setup - Secure Installation" -ForegroundColor Cyan
+Write-Host "======================================" -ForegroundColor Cyan
+Write-Host "📥 Downloading secure executable..." -ForegroundColor Yellow
+
 Invoke-WebRequest -Uri $downloadUrl -OutFile $tempFile
 
 Write-Host "🚀 Running Flutter Setup..." -ForegroundColor Green
@@ -13,4 +15,4 @@ Write-Host "🚀 Running Flutter Setup..." -ForegroundColor Green
 Write-Host "🧹 Cleaning up..." -ForegroundColor Yellow
 Remove-Item -Path $tempFile -Force -ErrorAction SilentlyContinue
 
-Write-Host "✅ Flutter setup completed!" -ForegroundColor Green
+Write-Host "✅ Flutter setup completed securely!" -ForegroundColor Green

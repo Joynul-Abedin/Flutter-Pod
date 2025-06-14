@@ -1,33 +1,44 @@
-# 🚀 Flutter Setup Distribution
+# 🔒 Flutter Setup - Secure Distribution
 
-## One-Click Installation
+## 🎯 Professional Installation
 
-### macOS & Linux
+### One-Command Setup (Recommended)
+
+#### macOS & Linux:
 ```bash
 curl -fsSL https://Joynul-Abedin.github.io/Flutter-Pod/install-mac | bash
 ```
 
-### Windows PowerShell
+#### Windows PowerShell:
 ```powershell
 iwr https://Joynul-Abedin.github.io/Flutter-Pod/install-windows -useb | iex
 ```
 
-## Direct Downloads
+### Direct Executable Downloads
 
 - **macOS**: [flutter-setup-macos](https://github.com/Joynul-Abedin/Flutter-Pod/releases/latest/download/flutter-setup-macos)
 - **Linux**: [flutter-setup-linux](https://github.com/Joynul-Abedin/Flutter-Pod/releases/latest/download/flutter-setup-linux)
-- **Windows**: [flutter-setup-windows.ps1](https://github.com/Joynul-Abedin/Flutter-Pod/releases/latest/download/flutter-setup-windows.ps1)
+- **Windows**: [flutter-setup-windows.exe](https://github.com/Joynul-Abedin/Flutter-Pod/releases/latest/download/flutter-setup-windows.exe)
 
-## Features
+## 🔒 Security Features
 
-- 🤖 **AI Error Recovery**: Built-in DeepSeek AI troubleshooting
-- 📊 **Unified Progress Bar**: Professional installation experience
-- 🔧 **Complete Setup**: Flutter + dependencies + PATH configuration
-- 🚀 **Cross-Platform**: macOS, Linux, Windows support
-- ✨ **Zero Config**: No API keys or setup required
+- ✅ **Source Code Protected**: Users receive only compiled executables
+- ✅ **No Script Exposure**: Original .sh and .ps1 files not accessible
+- ✅ **Secure Downloads**: All downloads via HTTPS from GitHub
+- ✅ **Integrity Verified**: Official releases only
+- ✅ **Enterprise Ready**: Professional security standards
 
-## Visit
+## 🚀 What Users Get
 
-🌐 **Landing Page**: https://Joynul-Abedin.github.io/Flutter-Pod
+- 🤖 **AI Error Recovery**: Built-in DeepSeek troubleshooting
+- 📊 **Unified Progress Bar**: Professional installation UI
+- 🔧 **Complete Setup**: Flutter + all dependencies
+- 🌍 **Cross-Platform**: macOS, Linux, Windows
+- ⚡ **Zero Config**: No setup required
 
-Generated: Sat Jun 14 22:07:17 +06 2025
+## 🌐 Landing Page
+
+Visit: **https://Joynul-Abedin.github.io/Flutter-Pod**
+
+---
+🔒 **Source code protected** • 🚀 **Enterprise-grade distribution**

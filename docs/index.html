@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🚀 Flutter Setup - One-Click Installation</title>
+    <title>🚀 Flutter Setup - Professional Installation</title>
     <style>
         * {
             margin: 0;
@@ -121,6 +121,15 @@
             overflow-x: auto;
         }
         
+        .security-notice {
+            background: rgba(34, 139, 34, 0.2);
+            border: 1px solid rgba(34, 139, 34, 0.5);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 30px 0;
+            text-align: center;
+        }
+        
         .footer {
             text-align: center;
             padding: 40px 0;
@@ -141,8 +150,13 @@
     <div class="container">
         <div class="header">
             <h1>🚀 Flutter Setup</h1>
-            <p>Professional Flutter development environment setup with AI-powered error recovery</p>
+            <p>Professional Flutter development environment with AI-powered error recovery</p>
             <p><strong>✨ Zero configuration • 🤖 AI assistance • 📊 Progress tracking</strong></p>
+        </div>
+        
+        <div class="security-notice">
+            <h3>🔒 Secure Distribution</h3>
+            <p>Source code protected • Only compiled executables provided • Enterprise-grade security</p>
         </div>
         
         <div class="features">
@@ -159,8 +173,8 @@
                 <p>Beautiful progress tracking with unified progress bar and clean output</p>
             </div>
             <div class="feature">
-                <h3>🔒 Secure & Fast</h3>
-                <p>Compiled executables ensure security and fastest installation experience</p>
+                <h3>🔒 Source Protected</h3>
+                <p>Compiled executables ensure complete source code protection and security</p>
             </div>
         </div>
         
@@ -171,7 +185,7 @@
                 <div class="download-card">
                     <h3>🍎 macOS</h3>
                     <p>Intel & Apple Silicon</p>
-                    <a href="#" class="download-btn" onclick="downloadMac()">Download for Mac</a>
+                    <a href="https://github.com/Joynul-Abedin/Flutter-Pod/releases/latest/download/flutter-setup-macos" class="download-btn">Download for Mac</a>
                     <div class="command-box">
                         curl -fsSL https://Joynul-Abedin.github.io/Flutter-Pod/install-mac | bash
                     </div>
@@ -180,7 +194,7 @@
                 <div class="download-card">
                     <h3>🐧 Linux</h3>
                     <p>Ubuntu, Debian & derivatives</p>
-                    <a href="#" class="download-btn" onclick="downloadLinux()">Download for Linux</a>
+                    <a href="https://github.com/Joynul-Abedin/Flutter-Pod/releases/latest/download/flutter-setup-linux" class="download-btn">Download for Linux</a>
                     <div class="command-box">
                         curl -fsSL https://Joynul-Abedin.github.io/Flutter-Pod/install-linux | bash
                     </div>
@@ -189,7 +203,7 @@
                 <div class="download-card">
                     <h3>🪟 Windows</h3>
                     <p>Windows 10/11 PowerShell</p>
-                    <a href="#" class="download-btn" onclick="downloadWindows()">Download for Windows</a>
+                    <a href="https://github.com/Joynul-Abedin/Flutter-Pod/releases/latest/download/flutter-setup-windows.exe" class="download-btn">Download for Windows</a>
                     <div class="command-box">
                         iwr https://Joynul-Abedin.github.io/Flutter-Pod/install-windows -useb | iex
                     </div>
@@ -199,37 +213,12 @@
         
         <div class="footer">
             <p>🎯 Get started with Flutter development in minutes, not hours</p>
-            <p>© 2024 Flutter Setup. Professional development tools.</p>
+            <p>🔒 Source code protected • Enterprise-grade security</p>
+            <p>© 2024 Flutter Setup Professional. Advanced development tools.</p>
         </div>
     </div>
     
     <script>
-        function downloadMac() {
-            // Analytics tracking
-            gtag('event', 'download', {
-                'platform': 'macos'
-            });
-            
-            // Trigger download
-            window.location.href = 'https://github.com/Joynul-Abedin/Flutter-Pod/releases/download/v1.0.0/flutter-setup-macos';
-        }
-        
-        function downloadLinux() {
-            gtag('event', 'download', {
-                'platform': 'linux'
-            });
-            
-            window.location.href = 'https://github.com/Joynul-Abedin/Flutter-Pod/releases/download/v1.0.0/flutter-setup-linux';
-        }
-        
-        function downloadWindows() {
-            gtag('event', 'download', {
-                'platform': 'windows'
-            });
-            
-            window.location.href = 'https://github.com/Joynul-Abedin/Flutter-Pod/releases/download/v1.0.0/flutter-setup-windows.exe';
-        }
-        
         // Auto-detect platform and highlight
         document.addEventListener('DOMContentLoaded', function() {
             const platform = navigator.platform.toLowerCase();
@@ -242,14 +231,5 @@
             }
         });
     </script>
-    
-    <!-- Google Analytics (optional) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'GA_MEASUREMENT_ID');
-    </script>
 </body>
-</html> 
+</html>

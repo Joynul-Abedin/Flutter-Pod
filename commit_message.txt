@@ -1,0 +1,6 @@
+feat: Implement secure distribution architecture
+
+- Landing page: PUBLIC via GitHub Pages  
+- Script files: INVISIBLE to internet users
+- Executables: Available through GitHub Releases only
+- Complete source code protection with professional distribution 
