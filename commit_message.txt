@@ -1,7 +1,0 @@
-feat: Add GitHub-based distribution system
-
-- Set up GitHub Pages for professional landing page
-- Create one-liner installers for each platform  
-- Add GitHub Actions workflow for automated releases
-- Configure distribution URLs using GitHub hosting
-- Enable secure source code protection with GitHub Releases 
