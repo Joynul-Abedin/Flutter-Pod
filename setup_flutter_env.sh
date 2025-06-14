@@ -45,6 +45,33 @@ log_step() {
 }
 
 # =============================================================================
+# 📊 PROGRESS TRACKING
+# =============================================================================
+TOTAL_STEPS=8
+CURRENT_PROGRESS=0
+
+update_progress() {
+    local step_name="$1"
+    CURRENT_PROGRESS=$((CURRENT_PROGRESS + 1))
+    local percentage=$((CURRENT_PROGRESS * 100 / TOTAL_STEPS))
+    
+    # Create progress bar
+    local bar_length=30
+    local filled_length=$((percentage * bar_length / 100))
+    local bar=""
+    
+    for ((i=0; i<filled_length; i++)); do
+        bar+="█"
+    done
+    
+    for ((i=filled_length; i<bar_length; i++)); do
+        bar+="░"
+    done
+    
+    echo -e "${CYAN}📊 Progress: [${bar}] ${percentage}% - ${step_name}${NC}"
+}
+
+# =============================================================================
 # 🤖 AI ERROR HANDLING
 # =============================================================================
 OPENROUTER_API_KEY="${OPENROUTER_API_KEY:-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}"
@@ -54,6 +81,7 @@ ask_ai_for_help() {
     local error_message="$1"
     local current_step="$2"
     local os_info="$3"
+    local auto_apply="${4:-false}"
     
     if [[ -z "$OPENROUTER_API_KEY" ]]; then
         log_warning "AI API key not available. Skipping AI error recovery."
@@ -69,11 +97,11 @@ ask_ai_for_help() {
     "messages": [
         {
             "role": "system",
-            "content": "You are a DevOps automation expert specializing in Flutter development environment setup. When given an error, analyze it and provide specific shell commands or actions to resolve the issue. Be concise and practical. Return only executable commands or clear instructions."
+            "content": "You are a DevOps automation expert specializing in Flutter development environment setup. When given an error, analyze it and provide specific shell commands or actions to resolve the issue. Return ONLY executable shell commands, one per line, that can be run automatically. No explanations, no markdown formatting, just raw commands. If multiple steps are needed, list them in order."
         },
         {
             "role": "user",
-            "content": "I'm setting up Flutter environment and encountered an error:\\n\\nCurrent Step: $current_step\\nOS Info: $os_info\\nError: $error_message\\n\\nPlease provide specific commands or actions to fix this issue."
+            "content": "I'm setting up Flutter environment and encountered an error:\\n\\nCurrent Step: $current_step\\nOS Info: $os_info\\nError: $error_message\\n\\nProvide the exact shell commands needed to fix this issue:"
         }
     ],
     "max_tokens": 500,
@@ -93,22 +121,83 @@ EOF
 import json, sys
 try:
     data = json.load(sys.stdin)
-    print(data['choices'][0]['message']['content'])
+    print(data['choices'][0]['message']['content'].strip())
 except:
     print('Failed to parse AI response')
     " 2>/dev/null)
     
     if [[ -n "$ai_suggestion" && "$ai_suggestion" != "Failed to parse AI response" ]]; then
-        log_info "🤖 AI Suggestion:"
+        log_info "🤖 AI Suggested Fix:"
         echo -e "${CYAN}$ai_suggestion${NC}"
         echo
-        read -p "🤔 Do you want to try the AI suggestion? (y/n): " -r
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
-            return 0
+        
+        if [[ "$auto_apply" == "true" ]]; then
+            log_info "🔄 Auto-applying AI suggestion..."
+            echo "$ai_suggestion" > /tmp/ai_fix_commands.sh
+            chmod +x /tmp/ai_fix_commands.sh
+            if /tmp/ai_fix_commands.sh; then
+                rm -f /tmp/ai_fix_commands.sh
+                return 0
+            else
+                rm -f /tmp/ai_fix_commands.sh
+                return 1
+            fi
+        else
+            read -p "🤔 Do you want to apply the AI suggestion? (y/n): " -r
+            if [[ $REPLY =~ ^[Yy]$ ]]; then
+                echo "$ai_suggestion" > /tmp/ai_fix_commands.sh
+                chmod +x /tmp/ai_fix_commands.sh
+                if /tmp/ai_fix_commands.sh; then
+                    rm -f /tmp/ai_fix_commands.sh
+                    return 0
+                else
+                    rm -f /tmp/ai_fix_commands.sh
+                    return 1
+                fi
+            fi
         fi
     else
         log_warning "Could not get AI suggestion. Please check your API key and internet connection."
     fi
+    
+    return 1
+}
+
+# Enhanced command execution with AI retry
+execute_with_ai_retry() {
+    local command="$1"
+    local description="$2"
+    local max_retries="${3:-3}"
+    local current_retry=0
+    
+    while [[ $current_retry -lt $max_retries ]]; do
+        log_info "Executing: $description"
+        
+        if eval "$command"; then
+            return 0
+        else
+            local exit_code=$?
+            current_retry=$((current_retry + 1))
+            
+            if [[ $current_retry -lt $max_retries ]]; then
+                log_warning "Command failed (attempt $current_retry/$max_retries). Consulting AI..."
+                
+                # Get the last few lines of error output
+                local error_context=$(eval "$command" 2>&1 | tail -10)
+                
+                if ask_ai_for_help "$error_context" "$description" "$(get_os_info)" "true"; then
+                    log_info "🔄 Retrying after AI fix..."
+                    continue
+                else
+                    log_warning "AI couldn't resolve the issue. Retrying..."
+                    sleep 2
+                fi
+            else
+                log_error "Command failed after $max_retries attempts: $description"
+                return $exit_code
+            fi
+        fi
+    done
     
     return 1
 }
@@ -204,13 +293,13 @@ add_to_path() {
 # =============================================================================
 install_basic_dependencies() {
     CURRENT_STEP="Installing basic dependencies"
-    log_step "$CURRENT_STEP"
+    update_progress "Installing basic dependencies"
     
     if is_macos; then
         # Install Homebrew if not present
         if ! command_exists brew; then
             log_info "Installing Homebrew..."
-            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+            execute_with_ai_retry '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"' "Homebrew installation"
             
             # Add Homebrew to PATH
             if is_apple_silicon; then
@@ -227,7 +316,7 @@ install_basic_dependencies() {
         for dep in "${deps[@]}"; do
             if ! command_exists "$dep"; then
                 log_info "Installing $dep..."
-                brew install "$dep"
+                execute_with_ai_retry "brew install $dep" "Installing $dep via Homebrew"
             else
                 log_success "$dep already installed"
             fi
@@ -236,18 +325,18 @@ install_basic_dependencies() {
     elif is_linux; then
         # Update package lists
         log_info "Updating package lists..."
-        sudo apt-get update
+        execute_with_ai_retry "sudo apt-get update" "Updating package lists"
         
         # Install dependencies
         local deps=("git" "wget" "curl" "unzip" "xz-utils" "zip" "libglu1-mesa")
         log_info "Installing dependencies: ${deps[*]}"
-        sudo apt-get install -y "${deps[@]}"
+        execute_with_ai_retry "sudo apt-get install -y ${deps[*]}" "Installing basic dependencies via apt"
     fi
 }
 
 install_java() {
     CURRENT_STEP="Installing Java JDK"
-    log_step "$CURRENT_STEP"
+    update_progress "Installing Java JDK"
     
     if command_exists java; then
         local java_version=$(java -version 2>&1 | head -n1 | cut -d'"' -f2)
@@ -257,17 +346,17 @@ install_java() {
     
     if is_macos; then
         log_info "Installing OpenJDK via Homebrew..."
-        brew install openjdk@11
+        execute_with_ai_retry "brew install openjdk@11" "Installing OpenJDK 11 via Homebrew"
         
         # Link it
-        sudo ln -sfn /opt/homebrew/opt/openjdk@11/libexec/openjdk.jdk /Library/Java/JavaVirtualMachines/openjdk-11.jdk 2>/dev/null || true
+        execute_with_ai_retry "sudo ln -sfn /opt/homebrew/opt/openjdk@11/libexec/openjdk.jdk /Library/Java/JavaVirtualMachines/openjdk-11.jdk" "Linking OpenJDK" || true
         
         # Add to PATH
         add_to_path "/opt/homebrew/opt/openjdk@11/bin"
         
     elif is_linux; then
         log_info "Installing OpenJDK 11..."
-        sudo apt-get install -y openjdk-11-jdk
+        execute_with_ai_retry "sudo apt-get install -y openjdk-11-jdk" "Installing OpenJDK 11 via apt"
     fi
 }
 
@@ -277,7 +366,7 @@ install_cocoapods() {
     fi
     
     CURRENT_STEP="Installing CocoaPods"
-    log_step "$CURRENT_STEP"
+    update_progress "Installing CocoaPods"
     
     if command_exists pod; then
         log_success "CocoaPods already installed"
@@ -287,16 +376,22 @@ install_cocoapods() {
     # Check if we have Ruby
     if ! command_exists ruby; then
         log_info "Installing Ruby via Homebrew..."
-        brew install ruby
+        execute_with_ai_retry "brew install ruby" "Installing Ruby via Homebrew"
         add_to_path "/opt/homebrew/opt/ruby/bin"
+        
+        # Refresh PATH for current session
+        export PATH="/opt/homebrew/opt/ruby/bin:$PATH"
     fi
     
     log_info "Installing CocoaPods..."
-    gem install cocoapods --user-install
+    execute_with_ai_retry "gem install cocoapods --user-install" "Installing CocoaPods via gem"
     
     # Add gem bin to PATH
     local gem_bin=$(ruby -e 'puts Gem.user_dir')/bin
     add_to_path "$gem_bin"
+    
+    # Refresh PATH for current session
+    export PATH="$gem_bin:$PATH"
 }
 
 # =============================================================================
@@ -333,7 +428,7 @@ except Exception as e:
 
 install_flutter() {
     CURRENT_STEP="Installing Flutter"
-    log_step "$CURRENT_STEP"
+    update_progress "Installing Flutter SDK"
     
     local flutter_dir="$HOME/flutter"
     
@@ -349,7 +444,7 @@ install_flutter() {
             return
         else
             log_warning "Flutter directory exists but seems corrupted. Removing..."
-            rm -rf "$flutter_dir"
+            execute_with_ai_retry "rm -rf $flutter_dir" "Removing corrupted Flutter directory"
         fi
     fi
     
@@ -374,23 +469,25 @@ install_flutter() {
     
     log_info "Downloading Flutter from: $download_url"
     
-    # Download Flutter
+    # Download Flutter with AI retry
     local temp_file="/tmp/flutter.tar.xz"
-    curl -L -o "$temp_file" "$download_url"
+    execute_with_ai_retry "curl -L -o $temp_file '$download_url'" "Downloading Flutter SDK"
     
-    # Extract Flutter
+    # Extract Flutter with AI retry
     log_info "Extracting Flutter..."
-    cd "$HOME"
-    tar -xf "$temp_file"
+    execute_with_ai_retry "cd $HOME && tar -xf $temp_file" "Extracting Flutter SDK"
     
     # Clean up
-    rm "$temp_file"
+    rm -f "$temp_file"
     
     # Add Flutter to PATH
     add_to_path "$flutter_dir/bin"
     
     # Make sure flutter is executable
-    chmod +x "$flutter_dir/bin/flutter"
+    execute_with_ai_retry "chmod +x $flutter_dir/bin/flutter" "Setting Flutter executable permissions"
+    
+    # Refresh PATH for current session
+    export PATH="$flutter_dir/bin:$PATH"
     
     log_success "Flutter installed successfully!"
 }
@@ -400,7 +497,7 @@ install_flutter() {
 # =============================================================================
 configure_flutter() {
     CURRENT_STEP="Configuring Flutter"
-    log_step "$CURRENT_STEP"
+    update_progress "Configuring Flutter"
     
     local flutter_bin="$HOME/flutter/bin/flutter"
     
@@ -409,17 +506,17 @@ configure_flutter() {
     
     # Run flutter doctor to initialize
     log_info "Running initial Flutter doctor check..."
-    $flutter_bin doctor -v || true  # Don't fail if doctor shows warnings
+    execute_with_ai_retry "$flutter_bin doctor -v" "Running Flutter doctor initialization" || true
     
     # Accept licenses if on macOS
     if is_macos; then
         log_info "Accepting Xcode license (if needed)..."
-        sudo xcodebuild -license accept 2>/dev/null || log_warning "Could not accept Xcode license. You may need to install Xcode first."
+        execute_with_ai_retry "sudo xcodebuild -license accept" "Accepting Xcode license" || log_warning "Could not accept Xcode license. You may need to install Xcode first."
     fi
     
     # Run flutter precache for common targets
     log_info "Running Flutter precache..."
-    $flutter_bin precache --universal
+    execute_with_ai_retry "$flutter_bin precache --universal" "Running Flutter precache"
     
     log_success "Flutter configuration completed!"
 }
@@ -429,18 +526,22 @@ configure_flutter() {
 # =============================================================================
 run_health_check() {
     CURRENT_STEP="Running health check"
-    log_step "$CURRENT_STEP"
+    update_progress "Running health check"
     
     export PATH="$HOME/flutter/bin:$PATH"
     
     echo
     log_info "🏥 Flutter Doctor Report:"
     echo "================================"
-    flutter doctor -v
+    execute_with_ai_retry "flutter doctor -v" "Running final Flutter doctor check" || true
     echo "================================"
     echo
     
-    log_success "Setup completed! Please restart your terminal or run 'source ~/.zshrc' (or ~/.bashrc) to use Flutter."
+    # Complete progress bar
+    update_progress "Installation complete"
+    echo
+    
+    log_success "🎉 Flutter environment setup completed successfully!"
     
     # Show next steps
     echo

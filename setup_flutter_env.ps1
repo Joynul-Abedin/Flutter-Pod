@@ -56,6 +56,26 @@ function Write-LogStep {
 }
 
 # =============================================================================
+# 📊 PROGRESS TRACKING
+# =============================================================================
+$script:TotalSteps = 6
+$script:CurrentProgress = 0
+
+function Update-Progress {
+    param([string]$StepName)
+    
+    $script:CurrentProgress++
+    $percentage = [math]::Round(($script:CurrentProgress * 100) / $script:TotalSteps)
+    
+    # Create progress bar
+    $barLength = 30
+    $filledLength = [math]::Round($percentage * $barLength / 100)
+    $bar = "█" * $filledLength + "░" * ($barLength - $filledLength)
+    
+    Write-Host "📊 Progress: [$bar] $percentage% - $StepName" -ForegroundColor $Colors.Cyan
+}
+
+# =============================================================================
 # 🤖 AI ERROR HANDLING
 # =============================================================================
 $script:OpenRouterApiKey = if ($env:OPENROUTER_API_KEY) { $env:OPENROUTER_API_KEY } else { "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" }
@@ -66,7 +86,8 @@ function Invoke-AIErrorRecovery {
     param(
         [string]$ErrorMessage,
         [string]$CurrentStep,
-        [string]$OSInfo
+        [string]$OSInfo,
+        [bool]$AutoApply = $false
     )
     
     if ($NoAI) {
@@ -83,11 +104,11 @@ function Invoke-AIErrorRecovery {
             messages = @(
                 @{
                     role = "system"
-                    content = "You are a DevOps automation expert specializing in Flutter development environment setup on Windows. When given an error, analyze it and provide specific PowerShell commands or actions to resolve the issue. Be concise and practical. Return only executable commands or clear instructions."
+                    content = "You are a DevOps automation expert specializing in Flutter development environment setup on Windows. When given an error, analyze it and provide specific PowerShell commands or actions to resolve the issue. Return ONLY executable PowerShell commands, one per line, that can be run automatically. No explanations, no markdown formatting, just raw commands. If multiple steps are needed, list them in order."
                 },
                 @{
                     role = "user"
-                    content = "I'm setting up Flutter environment on Windows and encountered an error:`n`nCurrent Step: $CurrentStep`nOS Info: $OSInfo`nError: $ErrorMessage`n`nPlease provide specific PowerShell commands or actions to fix this issue."
+                    content = "I'm setting up Flutter environment on Windows and encountered an error:`n`nCurrent Step: $CurrentStep`nOS Info: $OSInfo`nError: $ErrorMessage`n`nProvide the exact PowerShell commands needed to fix this issue:"
                 }
             )
             max_tokens = 500
@@ -103,14 +124,37 @@ function Invoke-AIErrorRecovery {
         $response = Invoke-RestMethod -Uri "https://openrouter.ai/api/v1/chat/completions" -Method Post -Body $payload -Headers $headers
         
         if ($response.choices -and $response.choices[0].message.content) {
-            $aiSuggestion = $response.choices[0].message.content
-            Write-LogInfo "🤖 AI Suggestion:"
+            $aiSuggestion = $response.choices[0].message.content.Trim()
+            Write-LogInfo "🤖 AI Suggested Fix:"
             Write-Host $aiSuggestion -ForegroundColor $Colors.Cyan
             Write-Host ""
             
-            $userChoice = Read-Host "🤔 Do you want to try the AI suggestion? (y/n)"
-            if ($userChoice -match "^[Yy]") {
-                return $true
+            if ($AutoApply) {
+                Write-LogInfo "🔄 Auto-applying AI suggestion..."
+                try {
+                    $aiSuggestion | Out-File -FilePath "$env:TEMP\ai_fix_commands.ps1" -Encoding UTF8
+                    & "$env:TEMP\ai_fix_commands.ps1"
+                    Remove-Item -Path "$env:TEMP\ai_fix_commands.ps1" -Force -ErrorAction SilentlyContinue
+                    return $true
+                }
+                catch {
+                    Remove-Item -Path "$env:TEMP\ai_fix_commands.ps1" -Force -ErrorAction SilentlyContinue
+                    return $false
+                }
+            } else {
+                $userChoice = Read-Host "🤔 Do you want to apply the AI suggestion? (y/n)"
+                if ($userChoice -match "^[Yy]") {
+                    try {
+                        $aiSuggestion | Out-File -FilePath "$env:TEMP\ai_fix_commands.ps1" -Encoding UTF8
+                        & "$env:TEMP\ai_fix_commands.ps1"
+                        Remove-Item -Path "$env:TEMP\ai_fix_commands.ps1" -Force -ErrorAction SilentlyContinue
+                        return $true
+                    }
+                    catch {
+                        Remove-Item -Path "$env:TEMP\ai_fix_commands.ps1" -Force -ErrorAction SilentlyContinue
+                        return $false
+                    }
+                }
             }
         } else {
             Write-LogWarning "Could not get AI suggestion. Please check your API key and internet connection."
@@ -118,6 +162,47 @@ function Invoke-AIErrorRecovery {
     }
     catch {
         Write-LogWarning "Failed to get AI suggestion: $_"
+    }
+    
+    return $false
+}
+
+# Enhanced command execution with AI retry
+function Invoke-CommandWithAIRetry {
+    param(
+        [scriptblock]$Command,
+        [string]$Description,
+        [int]$MaxRetries = 3
+    )
+    
+    $currentRetry = 0
+    
+    while ($currentRetry -lt $MaxRetries) {
+        Write-LogInfo "Executing: $Description"
+        
+        try {
+            & $Command
+            return $true
+        }
+        catch {
+            $currentRetry++
+            $errorMessage = $_.Exception.Message
+            
+            if ($currentRetry -lt $MaxRetries) {
+                Write-LogWarning "Command failed (attempt $currentRetry/$MaxRetries). Consulting AI..."
+                
+                if (Invoke-AIErrorRecovery -ErrorMessage $errorMessage -CurrentStep $Description -OSInfo (Get-OSInfo) -AutoApply $true) {
+                    Write-LogInfo "🔄 Retrying after AI fix..."
+                    continue
+                } else {
+                    Write-LogWarning "AI couldn't resolve the issue. Retrying..."
+                    Start-Sleep -Seconds 2
+                }
+            } else {
+                Write-LogError "Command failed after $MaxRetries attempts: $Description"
+                throw $_
+            }
+        }
     }
     
     return $false
@@ -205,57 +290,39 @@ function Install-Chocolatey {
 # =============================================================================
 function Install-BasicDependencies {
     $script:CurrentStep = "Installing basic dependencies"
-    Write-LogStep $script:CurrentStep
+    Update-Progress "Installing basic dependencies"
     
-    try {
-        # Install Chocolatey first
-        Install-Chocolatey
-        
-        # List of packages to install
-        $packages = @("git", "curl", "wget", "unzip", "7zip")
-        
-        foreach ($package in $packages) {
-            if (Test-CommandExists $package) {
-                Write-LogSuccess "$package already installed"
-            } else {
-                Write-LogInfo "Installing $package..."
-                choco install $package -y
-            }
+    # Install Chocolatey first
+    Install-Chocolatey
+    
+    # List of packages to install
+    $packages = @("git", "curl", "wget", "unzip", "7zip")
+    
+    foreach ($package in $packages) {
+        if (Test-CommandExists $package) {
+            Write-LogSuccess "$package already installed"
+        } else {
+            Write-LogInfo "Installing $package..."
+            Invoke-CommandWithAIRetry -Command { choco install $package -y } -Description "Installing $package via Chocolatey"
         }
-    }
-    catch {
-        Write-ErrorToLog -ErrorMessage $_.Exception.Message -Command "Install-BasicDependencies"
-        if (Invoke-AIErrorRecovery -ErrorMessage $_.Exception.Message -CurrentStep $script:CurrentStep -OSInfo (Get-OSInfo)) {
-            Write-LogInfo "Please apply the AI suggestion and retry."
-        }
-        throw
     }
 }
 
 function Install-Java {
     $script:CurrentStep = "Installing Java JDK"
-    Write-LogStep $script:CurrentStep
+    Update-Progress "Installing Java JDK"
     
-    try {
-        if (Test-CommandExists "java") {
-            $javaVersion = java -version 2>&1 | Select-String "version" | Select-Object -First 1
-            Write-LogSuccess "Java already installed: $javaVersion"
-            return
-        }
-        
-        Write-LogInfo "Installing OpenJDK 11..."
-        choco install openjdk11 -y
-        
-        # Refresh environment variables
-        $env:PATH = [System.Environment]::GetEnvironmentVariable("PATH","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("PATH","User")
+    if (Test-CommandExists "java") {
+        $javaVersion = java -version 2>&1 | Select-String "version" | Select-Object -First 1
+        Write-LogSuccess "Java already installed: $javaVersion"
+        return
     }
-    catch {
-        Write-ErrorToLog -ErrorMessage $_.Exception.Message -Command "Install-Java"
-        if (Invoke-AIErrorRecovery -ErrorMessage $_.Exception.Message -CurrentStep $script:CurrentStep -OSInfo (Get-OSInfo)) {
-            Write-LogInfo "Please apply the AI suggestion and retry."
-        }
-        throw
-    }
+    
+    Write-LogInfo "Installing OpenJDK 11..."
+    Invoke-CommandWithAIRetry -Command { choco install openjdk11 -y } -Description "Installing OpenJDK 11 via Chocolatey"
+    
+    # Refresh environment variables
+    $env:PATH = [System.Environment]::GetEnvironmentVariable("PATH","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("PATH","User")
 }
 
 # =============================================================================
@@ -282,62 +349,57 @@ function Get-FlutterDownloadUrl {
 
 function Install-Flutter {
     $script:CurrentStep = "Installing Flutter"
-    Write-LogStep $script:CurrentStep
+    Update-Progress "Installing Flutter SDK"
     
-    try {
-        # Check if Flutter is already installed
-        if (Test-Path $FlutterPath) {
-            Write-LogWarning "Flutter directory already exists. Checking installation..."
-            $flutterExe = Join-Path $FlutterPath "bin\flutter.bat"
-            if (Test-Path $flutterExe) {
-                try {
-                    $currentVersion = & $flutterExe --version 2>$null | Select-Object -First 1
-                    Write-LogSuccess "Flutter already installed: $currentVersion"
-                    Add-ToPath -PathToAdd (Join-Path $FlutterPath "bin")
-                    return
-                }
-                catch {
-                    Write-LogWarning "Flutter directory exists but seems corrupted. Removing..."
-                    Remove-Item -Path $FlutterPath -Recurse -Force
-                }
-            } else {
-                Write-LogWarning "Flutter directory exists but seems corrupted. Removing..."
-                Remove-Item -Path $FlutterPath -Recurse -Force
+    # Check if Flutter is already installed
+    if (Test-Path $FlutterPath) {
+        Write-LogWarning "Flutter directory already exists. Checking installation..."
+        $flutterExe = Join-Path $FlutterPath "bin\flutter.bat"
+        if (Test-Path $flutterExe) {
+            try {
+                $currentVersion = & $flutterExe --version 2>$null | Select-Object -First 1
+                Write-LogSuccess "Flutter already installed: $currentVersion"
+                Add-ToPath -PathToAdd (Join-Path $FlutterPath "bin")
+                return
             }
+            catch {
+                Write-LogWarning "Flutter directory exists but seems corrupted. Removing..."
+                Invoke-CommandWithAIRetry -Command { Remove-Item -Path $FlutterPath -Recurse -Force } -Description "Removing corrupted Flutter directory"
+            }
+        } else {
+            Write-LogWarning "Flutter directory exists but seems corrupted. Removing..."
+            Invoke-CommandWithAIRetry -Command { Remove-Item -Path $FlutterPath -Recurse -Force } -Description "Removing corrupted Flutter directory"
         }
-        
-        # Get download URL
-        $downloadUrl = Get-FlutterDownloadUrl
-        Write-LogInfo "Downloading Flutter from: $downloadUrl"
-        
-        # Download Flutter
-        $tempFile = "$env:TEMP\flutter.zip"
-        Invoke-WebRequest -Uri $downloadUrl -OutFile $tempFile
-        
-        # Extract Flutter
-        Write-LogInfo "Extracting Flutter..."
-        $parentDir = Split-Path $FlutterPath -Parent
+    }
+    
+    # Get download URL
+    $downloadUrl = Get-FlutterDownloadUrl
+    Write-LogInfo "Downloading Flutter from: $downloadUrl"
+    
+    # Download Flutter with AI retry
+    $tempFile = "$env:TEMP\flutter.zip"
+    Invoke-CommandWithAIRetry -Command { Invoke-WebRequest -Uri $downloadUrl -OutFile $tempFile } -Description "Downloading Flutter SDK"
+    
+    # Extract Flutter with AI retry
+    Write-LogInfo "Extracting Flutter..."
+    $parentDir = Split-Path $FlutterPath -Parent
+    Invoke-CommandWithAIRetry -Command { 
         if (!(Test-Path $parentDir)) {
             New-Item -ItemType Directory -Path $parentDir -Force | Out-Null
         }
-        
         Expand-Archive -Path $tempFile -DestinationPath $parentDir -Force
-        
-        # Clean up
-        Remove-Item -Path $tempFile -Force
-        
-        # Add Flutter to PATH
-        Add-ToPath -PathToAdd (Join-Path $FlutterPath "bin")
-        
-        Write-LogSuccess "Flutter installed successfully!"
-    }
-    catch {
-        Write-ErrorToLog -ErrorMessage $_.Exception.Message -Command "Install-Flutter"
-        if (Invoke-AIErrorRecovery -ErrorMessage $_.Exception.Message -CurrentStep $script:CurrentStep -OSInfo (Get-OSInfo)) {
-            Write-LogInfo "Please apply the AI suggestion and retry."
-        }
-        throw
-    }
+    } -Description "Extracting Flutter SDK"
+    
+    # Clean up
+    Remove-Item -Path $tempFile -Force -ErrorAction SilentlyContinue
+    
+    # Add Flutter to PATH
+    Add-ToPath -PathToAdd (Join-Path $FlutterPath "bin")
+    
+    # Refresh PATH for current session
+    $env:PATH = (Join-Path $FlutterPath "bin") + ";" + $env:PATH
+    
+    Write-LogSuccess "Flutter installed successfully!"
 }
 
 # =============================================================================
@@ -345,33 +407,19 @@ function Install-Flutter {
 # =============================================================================
 function Initialize-Flutter {
     $script:CurrentStep = "Configuring Flutter"
-    Write-LogStep $script:CurrentStep
+    Update-Progress "Configuring Flutter"
     
-    try {
-        $flutterExe = Join-Path $FlutterPath "bin\flutter.bat"
-        
-        # Run flutter doctor to initialize
-        Write-LogInfo "Running initial Flutter doctor check..."
-        try {
-            & $flutterExe doctor -v
-        }
-        catch {
-            Write-LogWarning "Flutter doctor completed with warnings (this is normal for initial setup)"
-        }
-        
-        # Run flutter precache for common targets
-        Write-LogInfo "Running Flutter precache..."
-        & $flutterExe precache --universal
-        
-        Write-LogSuccess "Flutter configuration completed!"
-    }
-    catch {
-        Write-ErrorToLog -ErrorMessage $_.Exception.Message -Command "Initialize-Flutter"
-        if (Invoke-AIErrorRecovery -ErrorMessage $_.Exception.Message -CurrentStep $script:CurrentStep -OSInfo (Get-OSInfo)) {
-            Write-LogInfo "Please apply the AI suggestion and retry."
-        }
-        throw
-    }
+    $flutterExe = Join-Path $FlutterPath "bin\flutter.bat"
+    
+    # Run flutter doctor to initialize
+    Write-LogInfo "Running initial Flutter doctor check..."
+    Invoke-CommandWithAIRetry -Command { & $flutterExe doctor -v } -Description "Running Flutter doctor initialization" -MaxRetries 2
+    
+    # Run flutter precache for common targets
+    Write-LogInfo "Running Flutter precache..."
+    Invoke-CommandWithAIRetry -Command { & $flutterExe precache --universal } -Description "Running Flutter precache"
+    
+    Write-LogSuccess "Flutter configuration completed!"
 }
 
 # =============================================================================
@@ -379,42 +427,37 @@ function Initialize-Flutter {
 # =============================================================================
 function Invoke-HealthCheck {
     $script:CurrentStep = "Running health check"
-    Write-LogStep $script:CurrentStep
+    Update-Progress "Running health check"
     
-    try {
-        $flutterExe = Join-Path $FlutterPath "bin\flutter.bat"
-        
-        Write-Host ""
-        Write-LogInfo "🏥 Flutter Doctor Report:"
-        Write-Host "================================" -ForegroundColor $Colors.White
-        & $flutterExe doctor -v
-        Write-Host "================================" -ForegroundColor $Colors.White
-        Write-Host ""
-        
-        Write-LogSuccess "Setup completed! Please restart your PowerShell session to use Flutter."
-        
-        # Show next steps
-        Write-Host ""
-        Write-LogInfo "🎯 Next Steps:"
-        Write-Host "1. Restart PowerShell or open a new session"
-        Write-Host "2. Verify installation: flutter --version"
-        Write-Host "3. Create your first app: flutter create my_app"
-        Write-Host "4. For Android development:"
-        Write-Host "   - Install Android Studio"
-        Write-Host "   - Run: flutter doctor --android-licenses"
-        Write-Host ""
-        Write-Host "📱 For Windows desktop development:"
-        Write-Host "1. Enable Windows desktop: flutter config --enable-windows-desktop"
-        Write-Host "2. Install Visual Studio (not VS Code) with C++ tools"
-        Write-Host ""
-    }
-    catch {
-        Write-ErrorToLog -ErrorMessage $_.Exception.Message -Command "Invoke-HealthCheck"
-        if (Invoke-AIErrorRecovery -ErrorMessage $_.Exception.Message -CurrentStep $script:CurrentStep -OSInfo (Get-OSInfo)) {
-            Write-LogInfo "Please apply the AI suggestion and retry."
-        }
-        throw
-    }
+    $flutterExe = Join-Path $FlutterPath "bin\flutter.bat"
+    
+    Write-Host ""
+    Write-LogInfo "🏥 Flutter Doctor Report:"
+    Write-Host "================================" -ForegroundColor $Colors.White
+    Invoke-CommandWithAIRetry -Command { & $flutterExe doctor -v } -Description "Running final Flutter doctor check" -MaxRetries 2
+    Write-Host "================================" -ForegroundColor $Colors.White
+    Write-Host ""
+    
+    # Complete progress bar
+    Update-Progress "Installation complete"
+    Write-Host ""
+    
+    Write-LogSuccess "🎉 Flutter environment setup completed successfully!"
+    
+    # Show next steps
+    Write-Host ""
+    Write-LogInfo "🎯 Next Steps:"
+    Write-Host "1. Restart PowerShell or open a new session"
+    Write-Host "2. Verify installation: flutter --version"
+    Write-Host "3. Create your first app: flutter create my_app"
+    Write-Host "4. For Android development:"
+    Write-Host "   - Install Android Studio"
+    Write-Host "   - Run: flutter doctor --android-licenses"
+    Write-Host ""
+    Write-Host "📱 For Windows desktop development:"
+    Write-Host "1. Enable Windows desktop: flutter config --enable-windows-desktop"
+    Write-Host "2. Install Visual Studio (not VS Code) with C++ tools"
+    Write-Host ""
 }
 
 # =============================================================================
