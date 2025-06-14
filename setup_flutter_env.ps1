@@ -30,29 +30,51 @@ $script:Colors = @{
 # =============================================================================
 # 📝 LOGGING FUNCTIONS
 # =============================================================================
+# Logging functions that work with sticky progress bar
 function Write-LogInfo {
     param([string]$Message)
     Write-Host "ℹ️  $Message" -ForegroundColor $Colors.Blue
+    # Redraw progress bar if active
+    if ($script:CurrentStepName) {
+        $percentage = [math]::Round(($script:CurrentProgress * 100) / $script:TotalSteps)
+        Draw-ProgressBar -StepName $script:CurrentStepName -Percentage $percentage
+    }
 }
 
 function Write-LogSuccess {
     param([string]$Message)
     Write-Host "✅ $Message" -ForegroundColor $Colors.Green
+    if ($script:CurrentStepName) {
+        $percentage = [math]::Round(($script:CurrentProgress * 100) / $script:TotalSteps)
+        Draw-ProgressBar -StepName $script:CurrentStepName -Percentage $percentage
+    }
 }
 
 function Write-LogWarning {
     param([string]$Message)
     Write-Host "⚠️  $Message" -ForegroundColor $Colors.Yellow
+    if ($script:CurrentStepName) {
+        $percentage = [math]::Round(($script:CurrentProgress * 100) / $script:TotalSteps)
+        Draw-ProgressBar -StepName $script:CurrentStepName -Percentage $percentage
+    }
 }
 
 function Write-LogError {
     param([string]$Message)
     Write-Host "❌ $Message" -ForegroundColor $Colors.Red
+    if ($script:CurrentStepName) {
+        $percentage = [math]::Round(($script:CurrentProgress * 100) / $script:TotalSteps)
+        Draw-ProgressBar -StepName $script:CurrentStepName -Percentage $percentage
+    }
 }
 
 function Write-LogStep {
     param([string]$Message)
     Write-Host "🔄 $Message" -ForegroundColor $Colors.Magenta
+    if ($script:CurrentStepName) {
+        $percentage = [math]::Round(($script:CurrentProgress * 100) / $script:TotalSteps)
+        Draw-ProgressBar -StepName $script:CurrentStepName -Percentage $percentage
+    }
 }
 
 # =============================================================================
@@ -67,16 +89,28 @@ function Initialize-ProgressBar {
     # Clear screen and initialize
     Clear-Host
     
+    # Reserve space for progress bar at bottom
+    try {
+        $consoleHeight = [Console]::WindowHeight
+        for ($i = 0; $i -lt ($consoleHeight - 2); $i++) {
+            Write-Host ""
+        }
+    }
+    catch {
+        # Fallback: just clear and continue
+    }
+    
     # Set up initial progress bar
     Draw-ProgressBar -StepName "Initializing Flutter Setup..." -Percentage 0
 }
 
 function Cleanup-ProgressBar {
-    # Move cursor to bottom and add final newline
+    # Move to a new line after progress bar and show cursor
     try {
         $consoleHeight = [Console]::WindowHeight
         [Console]::SetCursorPosition(0, $consoleHeight - 1)
         Write-Host ""
+        [Console]::CursorVisible = $true
     }
     catch {
         Write-Host ""
@@ -90,11 +124,10 @@ function Draw-ProgressBar {
     )
     
     try {
-        # Save current cursor position
-        $script:OriginalCursorPosition = @{
-            X = [Console]::CursorLeft
-            Y = [Console]::CursorTop
-        }
+        # Save current cursor position and hide cursor
+        $currentX = [Console]::CursorLeft
+        $currentY = [Console]::CursorTop
+        [Console]::CursorVisible = $false
         
         # Get console dimensions
         $consoleWidth = [Console]::WindowWidth
@@ -105,10 +138,12 @@ function Draw-ProgressBar {
         $filledLength = [math]::Round($Percentage * $barWidth / 100)
         $bar = "█" * $filledLength + "░" * ($barWidth - $filledLength)
         
-        # Move to bottom line
+        # Move to bottom line and clear it
+        [Console]::SetCursorPosition(0, $consoleHeight - 1)
+        Write-Host (" " * $consoleWidth) -NoNewline
         [Console]::SetCursorPosition(0, $consoleHeight - 1)
         
-        # Clear the line and draw progress bar
+        # Draw the progress bar
         $progressText = "📊 [$bar] $Percentage% - $StepName"
         if ($progressText.Length -gt $consoleWidth) {
             $progressText = $progressText.Substring(0, $consoleWidth - 1)
@@ -116,8 +151,9 @@ function Draw-ProgressBar {
         
         Write-Host $progressText -ForegroundColor $Colors.Cyan -NoNewline
         
-        # Restore cursor position
-        [Console]::SetCursorPosition($script:OriginalCursorPosition.X, $script:OriginalCursorPosition.Y)
+        # Restore cursor position and show cursor
+        [Console]::SetCursorPosition($currentX, $currentY)
+        [Console]::CursorVisible = $true
     }
     catch {
         # Fallback to simple progress display

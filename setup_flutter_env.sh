@@ -24,24 +24,47 @@ NC='\033[0m' # No Color
 # =============================================================================
 # 📝 LOGGING FUNCTIONS
 # =============================================================================
+# Logging functions that work with sticky progress bar
 log_info() {
-    echo -e "${BLUE}ℹ️  ${WHITE}$1${NC}"
+    # Clear current line, print message, then redraw progress bar
+    printf "\033[2K\r${BLUE}ℹ️  ${WHITE}$1${NC}\n"
+    # Redraw progress bar if it's active
+    if [[ -n "$CURRENT_STEP_NAME" ]]; then
+        local percentage=$((CURRENT_PROGRESS * 100 / TOTAL_STEPS))
+        draw_progress_bar "$CURRENT_STEP_NAME" "$percentage"
+    fi
 }
 
 log_success() {
-    echo -e "${GREEN}✅ ${WHITE}$1${NC}"
+    printf "\033[2K\r${GREEN}✅ ${WHITE}$1${NC}\n"
+    if [[ -n "$CURRENT_STEP_NAME" ]]; then
+        local percentage=$((CURRENT_PROGRESS * 100 / TOTAL_STEPS))
+        draw_progress_bar "$CURRENT_STEP_NAME" "$percentage"
+    fi
 }
 
 log_warning() {
-    echo -e "${YELLOW}⚠️  ${WHITE}$1${NC}"
+    printf "\033[2K\r${YELLOW}⚠️  ${WHITE}$1${NC}\n"
+    if [[ -n "$CURRENT_STEP_NAME" ]]; then
+        local percentage=$((CURRENT_PROGRESS * 100 / TOTAL_STEPS))
+        draw_progress_bar "$CURRENT_STEP_NAME" "$percentage"
+    fi
 }
 
 log_error() {
-    echo -e "${RED}❌ ${WHITE}$1${NC}"
+    printf "\033[2K\r${RED}❌ ${WHITE}$1${NC}\n"
+    if [[ -n "$CURRENT_STEP_NAME" ]]; then
+        local percentage=$((CURRENT_PROGRESS * 100 / TOTAL_STEPS))
+        draw_progress_bar "$CURRENT_STEP_NAME" "$percentage"
+    fi
 }
 
 log_step() {
-    echo -e "${PURPLE}🔄 ${WHITE}$1${NC}"
+    printf "\033[2K\r${PURPLE}🔄 ${WHITE}$1${NC}\n"
+    if [[ -n "$CURRENT_STEP_NAME" ]]; then
+        local percentage=$((CURRENT_PROGRESS * 100 / TOTAL_STEPS))
+        draw_progress_bar "$CURRENT_STEP_NAME" "$percentage"
+    fi
 }
 
 # =============================================================================
@@ -54,35 +77,29 @@ PROGRESS_LINE=""
 
 # Initialize progress bar
 init_progress_bar() {
-    # Save terminal state
-    tput smcup 2>/dev/null || true
-    
-    # Hide cursor
-    tput civis 2>/dev/null || true
-    
     # Clear screen and set up initial progress bar
     clear
+    
+    # Reserve space for progress bar at bottom
+    local terminal_height=$(tput lines 2>/dev/null || echo "24")
+    printf '\n%.0s' $(seq 1 $((terminal_height - 2)))
+    
     draw_progress_bar "Initializing Flutter Setup..." 0
 }
 
 # Cleanup progress bar
 cleanup_progress_bar() {
+    # Move to a new line after the progress bar
+    printf "\n"
+    
     # Show cursor
-    tput cnorm 2>/dev/null || true
-    
-    # Restore terminal state
-    tput rmcup 2>/dev/null || true
-    
-    echo # Final newline
+    printf "\033[?25h"
 }
 
 # Draw progress bar at bottom of terminal
 draw_progress_bar() {
     local step_name="$1"
     local percentage="$2"
-    
-    # Save current cursor position
-    tput sc 2>/dev/null || true
     
     # Get terminal dimensions
     local terminal_height=$(tput lines 2>/dev/null || echo "24")
@@ -106,15 +123,17 @@ draw_progress_bar() {
         bar+="░"
     done
     
-    # Move to bottom line
-    tput cup $((terminal_height - 1)) 0 2>/dev/null || true
+    # Save cursor position and disable cursor
+    printf "\033[s\033[?25l"
     
-    # Clear the line and draw progress bar
-    tput el 2>/dev/null || true
+    # Move to bottom line and clear it
+    printf "\033[%d;1H\033[K" "$terminal_height"
+    
+    # Draw the progress bar
     printf "${CYAN}📊 [${bar}] ${percentage}%% - ${step_name}${NC}"
     
-    # Restore cursor position
-    tput rc 2>/dev/null || true
+    # Restore cursor position and re-enable cursor
+    printf "\033[u\033[?25h"
 }
 
 # Update progress and redraw bar
