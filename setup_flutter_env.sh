@@ -194,11 +194,16 @@ ask_ai_for_help() {
 EOF
     )
     
-    # Call OpenRouter API
+    # Call OpenRouter API with debug output
     local response=$(curl -s -X POST "https://openrouter.ai/api/v1/chat/completions" \
         -H "Authorization: Bearer $OPENROUTER_API_KEY" \
         -H "Content-Type: application/json" \
+        -H "HTTP-Referer: https://github.com/Joynul-Abedin/Flutter-Pod" \
+        -H "X-Title: Flutter Setup Script" \
         -d "$payload")
+    
+    # Debug: Log the response for troubleshooting
+    echo "API Response: $response" >> "$ERROR_LOG_FILE"
     
     # Extract the content from response
     local ai_suggestion=$(echo "$response" | python3 -c "
@@ -462,25 +467,53 @@ install_cocoapods() {
         return
     fi
     
-    # Check if we have Ruby
-    if ! command_exists ruby; then
-        log_info "Installing Ruby via Homebrew..."
+    # Check Ruby version and install modern Ruby if needed
+    local ruby_version=""
+    if command_exists ruby; then
+        ruby_version=$(ruby -v | grep -o '[0-9]\+\.[0-9]\+' | head -1)
+        log_info "Current Ruby version: $ruby_version"
+    fi
+    
+    # Ruby 3.1+ is required for modern CocoaPods
+    if ! command_exists ruby || [[ $(echo "$ruby_version 3.1" | awk '{print ($1 < $2)}') == 1 ]]; then
+        log_info "Installing modern Ruby via Homebrew (Ruby 3.1+ required for CocoaPods)..."
         execute_with_ai_retry "brew install ruby" "Installing Ruby via Homebrew"
-        add_to_path "/opt/homebrew/opt/ruby/bin"
         
-        # Refresh PATH for current session
-        export PATH="/opt/homebrew/opt/ruby/bin:$PATH"
+        # Add Homebrew Ruby to PATH with higher priority
+        if is_apple_silicon; then
+            add_to_path "/opt/homebrew/opt/ruby/bin"
+            export PATH="/opt/homebrew/opt/ruby/bin:$PATH"
+            export GEM_HOME="/opt/homebrew/lib/ruby/gems/$(ruby -e 'puts RUBY_VERSION')"
+            export GEM_PATH="/opt/homebrew/lib/ruby/gems/$(ruby -e 'puts RUBY_VERSION')"
+        else
+            add_to_path "/usr/local/opt/ruby/bin"
+            export PATH="/usr/local/opt/ruby/bin:$PATH"
+            export GEM_HOME="/usr/local/lib/ruby/gems/$(ruby -e 'puts RUBY_VERSION')"
+            export GEM_PATH="/usr/local/lib/ruby/gems/$(ruby -e 'puts RUBY_VERSION')"
+        fi
+        
+        # Verify new Ruby version
+        ruby_version=$(ruby -v | grep -o '[0-9]\+\.[0-9]\+' | head -1)
+        log_info "Updated Ruby version: $ruby_version"
     fi
     
     log_info "Installing CocoaPods..."
-    execute_with_ai_retry "gem install cocoapods --user-install" "Installing CocoaPods via gem"
+    execute_with_ai_retry "gem install cocoapods" "Installing CocoaPods via gem"
     
     # Add gem bin to PATH
-    local gem_bin=$(ruby -e 'puts Gem.user_dir')/bin
-    add_to_path "$gem_bin"
+    local gem_bin
+    if command_exists gem; then
+        gem_bin=$(gem environment gemdir)/bin
+        add_to_path "$gem_bin"
+        export PATH="$gem_bin:$PATH"
+    fi
     
-    # Refresh PATH for current session
-    export PATH="$gem_bin:$PATH"
+    # Verify CocoaPods installation
+    if command_exists pod; then
+        log_success "CocoaPods installed successfully"
+    else
+        log_warning "CocoaPods installation may have issues, but continuing..."
+    fi
 }
 
 # =============================================================================
