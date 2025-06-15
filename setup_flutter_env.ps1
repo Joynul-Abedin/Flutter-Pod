@@ -182,7 +182,7 @@ function Update-ProgressText {
 # =============================================================================
 # 🤖 AI ERROR HANDLING
 # =============================================================================
-$script:OpenRouterApiKey = if ($env:OPENROUTER_API_KEY) { $env:OPENROUTER_API_KEY } else { "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" }
+$script:OpenRouterApiKey = if ($env:OPENROUTER_API_KEY) { $env:OPENROUTER_API_KEY } else { "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" }
 $script:ErrorLogFile = "$env:TEMP\flutter_setup_errors.log"
 $script:CurrentStep = "Unknown step"
 
