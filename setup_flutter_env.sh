@@ -158,7 +158,7 @@ update_progress_text() {
 # =============================================================================
 # 🤖 AI ERROR HANDLING
 # =============================================================================
-OPENROUTER_API_KEY="${OPENROUTER_API_KEY:-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}"
+OPENROUTER_API_KEY="${OPENROUTER_API_KEY:-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}"
 ERROR_LOG_FILE="/tmp/flutter_setup_errors.log"
 
 ask_ai_for_help() {
