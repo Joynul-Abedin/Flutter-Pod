@@ -539,9 +539,13 @@ install_cocoapods() {
     CURRENT_STEP="Installing CocoaPods"
     update_progress "Installing CocoaPods"
     
-    if command_exists pod; then
-        log_success "CocoaPods already installed"
+    # Check if CocoaPods is properly installed and working
+    if command_exists pod && pod --version >/dev/null 2>&1; then
+        local pod_version=$(pod --version 2>/dev/null)
+        log_success "CocoaPods already installed: $pod_version"
         return
+    elif command_exists pod; then
+        log_warning "CocoaPods command found but not working properly. Reinstalling..."
     fi
     
     # Check Ruby version and install modern Ruby if needed
@@ -572,6 +576,12 @@ install_cocoapods() {
         # Verify new Ruby version
         ruby_version=$(ruby -v | grep -o '[0-9]\+\.[0-9]\+' | head -1)
         log_info "Updated Ruby version: $ruby_version"
+        
+        # Force reinstallation of CocoaPods with new Ruby
+        if command_exists pod; then
+            log_info "Removing old CocoaPods installation to ensure compatibility with new Ruby..."
+            gem uninstall cocoapods --all --ignore-dependencies 2>/dev/null || true
+        fi
     fi
     
     log_info "Installing CocoaPods..."
@@ -585,11 +595,17 @@ install_cocoapods() {
         export PATH="$gem_bin:$PATH"
     fi
     
+    # Setup CocoaPods repo if needed
+    log_info "Setting up CocoaPods repository..."
+    execute_with_ai_retry "pod setup" "Setting up CocoaPods repository" || log_warning "CocoaPods setup had issues, but continuing..."
+    
     # Verify CocoaPods installation
-    if command_exists pod; then
-        log_success "CocoaPods installed successfully"
+    if command_exists pod && pod --version >/dev/null 2>&1; then
+        local pod_version=$(pod --version 2>/dev/null)
+        log_success "CocoaPods installed successfully: $pod_version"
     else
         log_warning "CocoaPods installation may have issues, but continuing..."
+        log_info "💡 You may need to run 'gem install cocoapods' manually after the setup"
     fi
 }
 
