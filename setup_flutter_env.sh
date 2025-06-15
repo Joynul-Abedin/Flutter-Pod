@@ -333,7 +333,7 @@ except:
 execute_with_ai_retry() {
     local command="$1"
     local description="$2"
-    local max_retries="${3:-3}"
+    local max_retries="${3:-6}"
     local current_retry=0
     
     while [[ $current_retry -lt $max_retries ]]; do

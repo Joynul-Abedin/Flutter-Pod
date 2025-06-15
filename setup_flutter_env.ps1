@@ -352,7 +352,7 @@ function Invoke-CommandWithAIRetry {
     param(
         [scriptblock]$Command,
         [string]$Description,
-        [int]$MaxRetries = 3
+        [int]$MaxRetries = 6
     )
     
     $currentRetry = 0

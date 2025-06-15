@@ -1,0 +1,8 @@
+Increase max retry attempts from 3 to 6
+
+- Updated both Bash and PowerShell scripts to use 6 retry attempts instead of 3
+- Provides more opportunities for AI error recovery to resolve complex issues
+- Better resilience for installations with multiple dependency problems
+
+This gives the AI more chances to resolve installation issues automatically,
+improving the overall success rate for challenging environments. 
