@@ -5,7 +5,7 @@ Cross-platform Flutter development environment setup with AI-powered error recov
 ## 🌟 Features
 
 - **🔥 One-Click Setup**: Complete Flutter environment installation
-- **🤖 AI Error Recovery**: Built-in intelligent troubleshooting (no API key needed)
+- **🤖 AI Error Recovery**: Optional intelligent troubleshooting with DeepSeek AI
 - **📊 Progress Tracking**: Professional progress bar with clean output
 - **🌍 Cross-Platform**: Works on macOS, Linux, and Windows
 - **⚡ Smart Detection**: Skips already installed components
@@ -49,14 +49,44 @@ Invoke-WebRequest -Uri "https://raw.githubusercontent.com/Joynul-Abedin/Flutter-
 - **Linux**: APT packages, Flutter dependencies
 - **Windows**: Chocolatey, development tools
 
-## 🎯 AI-Powered Smart Installation
+## 🤖 AI-Powered Error Recovery
 
-The scripts include intelligent error recovery that automatically:
+The scripts include optional intelligent error recovery that automatically:
 
 1. **Detects Issues**: Identifies installation failures
-2. **Consults AI**: Uses DeepSeek AI for problem analysis
+2. **Consults AI**: Uses DeepSeek AI for problem analysis  
 3. **Applies Fixes**: Automatically resolves dependency issues
 4. **Continues Setup**: Seamlessly resumes installation
+
+### 🔑 Enable AI Features (Optional)
+
+For enhanced error recovery, you can enable AI assistance:
+
+#### Option 1: Interactive Setup
+The script will ask for your API key when you run it:
+```bash
+# macOS/Linux
+curl -fsSL https://raw.githubusercontent.com/Joynul-Abedin/Flutter-Pod/main/setup_flutter_env.sh | bash
+
+# Windows
+.\setup_flutter_env.ps1
+```
+
+#### Option 2: Environment Variable
+```bash
+# Get free API key from https://openrouter.ai
+export OPENROUTER_API_KEY="your-api-key-here"
+
+# macOS/Linux
+./setup_flutter_env.sh
+
+# Windows PowerShell
+$env:OPENROUTER_API_KEY="your-api-key-here"
+.\setup_flutter_env.ps1
+```
+
+#### Option 3: Skip AI Features
+Scripts work perfectly without AI - just press Enter when asked for API key.
 
 ### Visual Progress Experience
 ```
@@ -64,7 +94,8 @@ The scripts include intelligent error recovery that automatically:
 🚀     Powered by AI Error Recovery (DeepSeek)                  🚀
 
 ℹ️  🖥️  System: macOS 15.3.2 (arm64)
-✅ 🤖 AI Error Recovery: Enabled
+✅ 🤖 AI Error Recovery: Enabled (with API key)
+⚠️  🤖 AI Error Recovery: Disabled (no API key provided)
 
 ────────────────────────────────────────────────────────────────
 📊 [███████████░░░░░░░░░░░░░░░░░░░] 37% - Installing Flutter SDK

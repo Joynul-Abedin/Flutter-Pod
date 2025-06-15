@@ -1,20 +1,30 @@
-Remove hardcoded API keys and make AI features optional
+Add interactive API key setup and update documentation
 
-SECURITY FIX: Removed hardcoded OpenRouter API keys from public repository
+Enhanced user experience with interactive API key collection:
 
-- Removed hardcoded API keys from both Bash and PowerShell scripts
-- Made AI error recovery an optional feature requiring user's own API key
-- Added helpful instructions for users to get their own free API key
-- Improved status messaging to clearly indicate when AI features are available
-- Scripts now work without API key but with reduced AI assistance capabilities
+SCRIPT IMPROVEMENTS:
+- Added interactive API key prompting at script start
+- Beautiful intro screen explaining AI benefits
+- API key validation with immediate feedback
+- Clear instructions for getting free OpenRouter API key
+- Graceful fallback when no API key provided
+- Works on both Bash (macOS/Linux) and PowerShell (Windows)
 
-This prevents API key abuse and rate limiting when scripts are run by multiple users
-from the public GitHub repository. Users who want AI-powered error recovery can
-easily get their own free API key from https://openrouter.ai and set the
-OPENROUTER_API_KEY environment variable.
+DOCUMENTATION UPDATES:
+- Updated README with comprehensive API key setup guide
+- Added three different ways to provide API key:
+  1. Interactive prompt (new default)
+  2. Environment variable
+  3. Skip AI features entirely
+- Clear examples for all platforms
+- Updated visual progress examples
 
-Benefits:
-- Protects API keys from public exposure and abuse
-- Maintains backward compatibility (scripts work without API key)
-- Clear user guidance for enabling AI features
-- Better security practices for public repositories 
+BENEFITS:
+- Better user onboarding experience
+- Clearer understanding of AI features
+- No confusion about API key requirements
+- Seamless experience for users who want AI assistance
+- Zero friction for users who prefer basic setup
+
+The script now provides an excellent first-time user experience while
+maintaining all existing functionality and backward compatibility. 

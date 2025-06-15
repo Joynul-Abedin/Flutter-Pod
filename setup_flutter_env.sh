@@ -161,6 +161,58 @@ update_progress_text() {
 OPENROUTER_API_KEY="${OPENROUTER_API_KEY:-}"
 ERROR_LOG_FILE="/tmp/flutter_setup_errors.log"
 
+# Function to prompt for API key
+prompt_for_api_key() {
+    if [[ -n "$OPENROUTER_API_KEY" ]]; then
+        return # Already have API key from environment
+    fi
+    
+    echo
+    log_info "🤖 AI-Powered Error Recovery Setup"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo
+    log_info "This script can use AI to automatically fix installation errors."
+    log_info "To enable this feature, you need a free API key from OpenRouter."
+    echo
+    log_info "💡 Benefits of AI Error Recovery:"
+    log_info "   • Automatic troubleshooting of installation issues"
+    log_info "   • Intelligent fixes for dependency problems"
+    log_info "   • Reduced manual intervention needed"
+    echo
+    log_info "🔗 Get your free API key: https://openrouter.ai"
+    log_info "   1. Sign up for free account"
+    log_info "   2. Go to Keys section"
+    log_info "   3. Create a new API key"
+    echo
+    log_warning "⚠️  Note: AI features are optional - script works fine without them!"
+    echo
+    
+    read -p "🔑 Enter your OpenRouter API key (or press Enter to skip): " -r
+    OPENROUTER_API_KEY="$REPLY"
+    
+    if [[ -n "$OPENROUTER_API_KEY" ]]; then
+        # Test the API key
+        log_info "🧪 Testing API key..."
+        local test_response=$(curl -s -X POST "https://openrouter.ai/api/v1/chat/completions" \
+            -H "Authorization: Bearer $OPENROUTER_API_KEY" \
+            -H "Content-Type: application/json" \
+            -H "HTTP-Referer: https://github.com/Joynul-Abedin/Flutter-Pod" \
+            -H "X-Title: Flutter Setup Script" \
+            -d '{"model": "deepseek/deepseek-chat-v3-0324:free", "messages": [{"role": "user", "content": "test"}], "max_tokens": 5}')
+        
+        if echo "$test_response" | grep -q '"choices"'; then
+            log_success "✅ API key is valid! AI error recovery enabled."
+        else
+            log_warning "⚠️  API key test failed. Continuing without AI features."
+            log_info "💡 You can set OPENROUTER_API_KEY environment variable and re-run"
+            OPENROUTER_API_KEY=""
+        fi
+    else
+        log_info "ℹ️  Continuing without AI features. Basic error handling will be used."
+    fi
+    echo
+}
+
 ask_ai_for_help() {
     local error_message="$1"
     local current_step="$2"
@@ -699,7 +751,9 @@ main() {
     echo "🚀     Powered by AI Error Recovery (DeepSeek)                  🚀"
     echo "🚀                                                              🚀"
     echo "🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀"
-    echo
+    
+    # Prompt for API key before starting
+    prompt_for_api_key
     
     log_info "🖥️  System Information: $(get_os_info)"
     echo
@@ -707,8 +761,8 @@ main() {
     if [[ -n "$OPENROUTER_API_KEY" ]]; then
         log_success "🤖 AI Error Recovery: Enabled"
     else
-        log_warning "🤖 AI Error Recovery: Disabled (set OPENROUTER_API_KEY to enable)"
-        log_info "💡 Get a free API key from https://openrouter.ai for intelligent error handling"
+        log_warning "🤖 AI Error Recovery: Disabled"
+        log_info "💡 Basic error handling will be used"
     fi
     echo
     

@@ -186,6 +186,73 @@ $script:OpenRouterApiKey = if ($env:OPENROUTER_API_KEY) { $env:OPENROUTER_API_KE
 $script:ErrorLogFile = "$env:TEMP\flutter_setup_errors.log"
 $script:CurrentStep = "Unknown step"
 
+# Function to prompt for API key
+function Request-ApiKey {
+    if ($script:OpenRouterApiKey) {
+        return # Already have API key from environment
+    }
+    
+    Write-Host ""
+    Write-LogInfo "🤖 AI-Powered Error Recovery Setup"
+    Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor $Colors.White
+    Write-Host ""
+    Write-LogInfo "This script can use AI to automatically fix installation errors."
+    Write-LogInfo "To enable this feature, you need a free API key from OpenRouter."
+    Write-Host ""
+    Write-LogInfo "💡 Benefits of AI Error Recovery:"
+    Write-LogInfo "   • Automatic troubleshooting of installation issues"
+    Write-LogInfo "   • Intelligent fixes for dependency problems"
+    Write-LogInfo "   • Reduced manual intervention needed"
+    Write-Host ""
+    Write-LogInfo "🔗 Get your free API key: https://openrouter.ai"
+    Write-LogInfo "   1. Sign up for free account"
+    Write-LogInfo "   2. Go to Keys section"
+    Write-LogInfo "   3. Create a new API key"
+    Write-Host ""
+    Write-LogWarning "⚠️  Note: AI features are optional - script works fine without them!"
+    Write-Host ""
+    
+    $userInput = Read-Host "🔑 Enter your OpenRouter API key (or press Enter to skip)"
+    $script:OpenRouterApiKey = $userInput.Trim()
+    
+    if ($script:OpenRouterApiKey) {
+        # Test the API key
+        Write-LogInfo "🧪 Testing API key..."
+        try {
+            $testPayload = @{
+                model = "deepseek/deepseek-chat-v3-0324:free"
+                messages = @(@{ role = "user"; content = "test" })
+                max_tokens = 5
+            } | ConvertTo-Json -Depth 10
+            
+            $testHeaders = @{
+                "Authorization" = "Bearer $script:OpenRouterApiKey"
+                "Content-Type" = "application/json"
+                "HTTP-Referer" = "https://github.com/Joynul-Abedin/Flutter-Pod"
+                "X-Title" = "Flutter Setup Script"
+            }
+            
+            $testResponse = Invoke-RestMethod -Uri "https://openrouter.ai/api/v1/chat/completions" -Method Post -Body $testPayload -Headers $testHeaders -TimeoutSec 10
+            
+            if ($testResponse.choices) {
+                Write-LogSuccess "✅ API key is valid! AI error recovery enabled."
+            } else {
+                Write-LogWarning "⚠️  API key test failed. Continuing without AI features."
+                Write-LogInfo "💡 You can set `$env:OPENROUTER_API_KEY and re-run"
+                $script:OpenRouterApiKey = ""
+            }
+        }
+        catch {
+            Write-LogWarning "⚠️  API key test failed: $_"
+            Write-LogInfo "💡 Continuing without AI features"
+            $script:OpenRouterApiKey = ""
+        }
+    } else {
+        Write-LogInfo "ℹ️  Continuing without AI features. Basic error handling will be used."
+    }
+    Write-Host ""
+}
+
 function Invoke-AIErrorRecovery {
     param(
         [string]$ErrorMessage,
@@ -588,7 +655,11 @@ function Main {
         Write-Host "🚀     Powered by AI Error Recovery (DeepSeek)                  🚀" -ForegroundColor $Colors.Cyan
         Write-Host "🚀                                                              🚀" -ForegroundColor $Colors.Cyan
         Write-Host "🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀" -ForegroundColor $Colors.Cyan
-        Write-Host ""
+        
+        # Prompt for API key before starting
+        if (!$NoAI) {
+            Request-ApiKey
+        }
         
         Write-LogInfo "🖥️  System Information: $(Get-OSInfo)"
         
@@ -601,8 +672,8 @@ function Main {
         if ($NoAI) {
             Write-LogWarning "🤖 AI Error Recovery: Disabled (NoAI flag set)"
         } elseif ([string]::IsNullOrEmpty($script:OpenRouterApiKey)) {
-            Write-LogWarning "🤖 AI Error Recovery: Disabled (set OPENROUTER_API_KEY to enable)"
-            Write-LogInfo "💡 Get a free API key from https://openrouter.ai for intelligent error handling"
+            Write-LogWarning "🤖 AI Error Recovery: Disabled"
+            Write-LogInfo "💡 Basic error handling will be used"
         } else {
             Write-LogSuccess "🤖 AI Error Recovery: Enabled"
         }
