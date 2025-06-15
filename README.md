@@ -16,13 +16,17 @@ Cross-platform Flutter development environment setup with AI-powered error recov
 ### macOS & Linux
 
 ```bash
-# Download and run
+# Quick install (basic setup, no interactive prompts)
 curl -fsSL https://raw.githubusercontent.com/Joynul-Abedin/Flutter-Pod/main/setup_flutter_env.sh | bash
 
-# Or download first, then run
+# Interactive setup (with AI key prompting)
 curl -O https://raw.githubusercontent.com/Joynul-Abedin/Flutter-Pod/main/setup_flutter_env.sh
 chmod +x setup_flutter_env.sh
 ./setup_flutter_env.sh
+
+# With AI features enabled
+export OPENROUTER_API_KEY="your-key-here"
+curl -fsSL https://raw.githubusercontent.com/Joynul-Abedin/Flutter-Pod/main/setup_flutter_env.sh | bash
 ```
 
 ### Windows PowerShell
@@ -63,12 +67,15 @@ The scripts include optional intelligent error recovery that automatically:
 For enhanced error recovery, you can enable AI assistance:
 
 #### Option 1: Interactive Setup
-The script will ask for your API key when you run it:
+Download and run the script directly for interactive API key prompting:
 ```bash
 # macOS/Linux
-curl -fsSL https://raw.githubusercontent.com/Joynul-Abedin/Flutter-Pod/main/setup_flutter_env.sh | bash
+curl -O https://raw.githubusercontent.com/Joynul-Abedin/Flutter-Pod/main/setup_flutter_env.sh
+chmod +x setup_flutter_env.sh
+./setup_flutter_env.sh
 
 # Windows
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/Joynul-Abedin/Flutter-Pod/main/setup_flutter_env.ps1" -OutFile "setup_flutter_env.ps1"
 .\setup_flutter_env.ps1
 ```
 
@@ -85,8 +92,15 @@ $env:OPENROUTER_API_KEY="your-api-key-here"
 .\setup_flutter_env.ps1
 ```
 
-#### Option 3: Skip AI Features
-Scripts work perfectly without AI - just press Enter when asked for API key.
+#### Option 3: Quick Install (No AI)
+For fastest setup without AI features, use the one-liner:
+```bash
+# macOS/Linux
+curl -fsSL https://raw.githubusercontent.com/Joynul-Abedin/Flutter-Pod/main/setup_flutter_env.sh | bash
+
+# Windows PowerShell (run as Admin)
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/Joynul-Abedin/Flutter-Pod/main/setup_flutter_env.ps1" -OutFile "setup.ps1"; .\setup.ps1; Remove-Item setup.ps1
+```
 
 ### Visual Progress Experience
 ```

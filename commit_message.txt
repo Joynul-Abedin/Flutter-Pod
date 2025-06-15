@@ -1,30 +1,28 @@
-Add interactive API key setup and update documentation
+Fix script hanging in pipe mode and improve documentation
 
-Enhanced user experience with interactive API key collection:
+PROBLEM FIXED:
+- Script was hanging when running `curl | bash` due to interactive prompt
+- Users couldn't use the one-liner command from README
 
-SCRIPT IMPROVEMENTS:
-- Added interactive API key prompting at script start
-- Beautiful intro screen explaining AI benefits
-- API key validation with immediate feedback
-- Clear instructions for getting free OpenRouter API key
-- Graceful fallback when no API key provided
-- Works on both Bash (macOS/Linux) and PowerShell (Windows)
+SOLUTION:
+- Added pipe detection to skip interactive prompts when script runs via `curl | bash`
+- Script now automatically continues with basic error handling in pipe mode
+- Added clear messaging about AI features being available via environment variable
 
-DOCUMENTATION UPDATES:
-- Updated README with comprehensive API key setup guide
-- Added three different ways to provide API key:
-  1. Interactive prompt (new default)
-  2. Environment variable
-  3. Skip AI features entirely
-- Clear examples for all platforms
-- Updated visual progress examples
+DOCUMENTATION IMPROVEMENTS:
+- Updated README with three clear usage options:
+  1. Quick install (pipe mode, no AI)
+  2. Interactive setup (download + run, with AI prompts)
+  3. Environment variable setup (pipe mode with AI)
+- Fixed examples to match actual functionality
+- Clearer separation between interactive and non-interactive usage
 
 BENEFITS:
-- Better user onboarding experience
-- Clearer understanding of AI features
-- No confusion about API key requirements
-- Seamless experience for users who want AI assistance
-- Zero friction for users who prefer basic setup
+- One-liner curl command now works perfectly
+- No more script hanging issues
+- Users can choose their preferred installation method
+- Better user experience for all usage patterns
+- Maintains all existing functionality
 
-The script now provides an excellent first-time user experience while
-maintaining all existing functionality and backward compatibility. 
+This resolves the issue where `curl | bash` would stop and hang,
+making the script truly ready for public one-liner usage. 

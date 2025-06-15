@@ -161,10 +161,31 @@ update_progress_text() {
 OPENROUTER_API_KEY="${OPENROUTER_API_KEY:-}"
 ERROR_LOG_FILE="/tmp/flutter_setup_errors.log"
 
+# Function to check if script is running in a pipe
+is_piped() {
+    [[ ! -t 0 ]]
+}
+
 # Function to prompt for API key
 prompt_for_api_key() {
     if [[ -n "$OPENROUTER_API_KEY" ]]; then
         return # Already have API key from environment
+    fi
+    
+    # Check if we're running in a pipe (like curl | bash)
+    if is_piped; then
+        echo
+        log_info "🤖 AI-Powered Error Recovery Available"
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo
+        log_info "💡 This script supports AI-powered error recovery!"
+        log_info "   To enable: Set OPENROUTER_API_KEY environment variable"
+        log_info "   Get free key: https://openrouter.ai"
+        echo
+        log_info "🔄 Running with basic error handling (no user input available in pipe mode)"
+        log_info "💡 For interactive setup: Download script and run directly"
+        echo
+        return
     fi
     
     echo
