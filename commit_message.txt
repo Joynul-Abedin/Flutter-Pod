@@ -1,0 +1,20 @@
+Remove hardcoded API keys and make AI features optional
+
+SECURITY FIX: Removed hardcoded OpenRouter API keys from public repository
+
+- Removed hardcoded API keys from both Bash and PowerShell scripts
+- Made AI error recovery an optional feature requiring user's own API key
+- Added helpful instructions for users to get their own free API key
+- Improved status messaging to clearly indicate when AI features are available
+- Scripts now work without API key but with reduced AI assistance capabilities
+
+This prevents API key abuse and rate limiting when scripts are run by multiple users
+from the public GitHub repository. Users who want AI-powered error recovery can
+easily get their own free API key from https://openrouter.ai and set the
+OPENROUTER_API_KEY environment variable.
+
+Benefits:
+- Protects API keys from public exposure and abuse
+- Maintains backward compatibility (scripts work without API key)
+- Clear user guidance for enabling AI features
+- Better security practices for public repositories 

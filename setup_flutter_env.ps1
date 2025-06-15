@@ -182,7 +182,7 @@ function Update-ProgressText {
 # =============================================================================
 # 🤖 AI ERROR HANDLING
 # =============================================================================
-$script:OpenRouterApiKey = if ($env:OPENROUTER_API_KEY) { $env:OPENROUTER_API_KEY } else { "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" }
+$script:OpenRouterApiKey = if ($env:OPENROUTER_API_KEY) { $env:OPENROUTER_API_KEY } else { "" }
 $script:ErrorLogFile = "$env:TEMP\flutter_setup_errors.log"
 $script:CurrentStep = "Unknown step"
 
@@ -196,6 +196,15 @@ function Invoke-AIErrorRecovery {
     
     if ($NoAI) {
         Write-LogWarning "AI error recovery disabled by NoAI flag. Skipping AI error recovery."
+        return $false
+    }
+    
+    if ([string]::IsNullOrEmpty($script:OpenRouterApiKey)) {
+        Write-LogWarning "🤖 AI Error Recovery: Not available (no API key provided)"
+        Write-LogInfo "💡 To enable AI-powered error recovery:"
+        Write-LogInfo "   1. Get a free API key from https://openrouter.ai"
+        Write-LogInfo "   2. Set environment variable: `$env:OPENROUTER_API_KEY='your-key'"
+        Write-LogInfo "   3. Re-run the script"
         return $false
     }
     
@@ -591,6 +600,9 @@ function Main {
         
         if ($NoAI) {
             Write-LogWarning "🤖 AI Error Recovery: Disabled (NoAI flag set)"
+        } elseif ([string]::IsNullOrEmpty($script:OpenRouterApiKey)) {
+            Write-LogWarning "🤖 AI Error Recovery: Disabled (set OPENROUTER_API_KEY to enable)"
+            Write-LogInfo "💡 Get a free API key from https://openrouter.ai for intelligent error handling"
         } else {
             Write-LogSuccess "🤖 AI Error Recovery: Enabled"
         }
