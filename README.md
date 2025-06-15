@@ -2,6 +2,55 @@
 
 Cross-platform Flutter development environment setup with AI-powered error recovery.
 
+## 🚀 Quick Start - Choose Your Installation Method
+
+### 🍎 macOS & Linux
+
+#### 🔥 Option 1: Quick Install (Fastest)
+**Perfect for: Fast setup without interactive prompts**
+```bash
+curl -fsSL https://raw.githubusercontent.com/Joynul-Abedin/Flutter-Pod/main/setup_flutter_env.sh | bash
+```
+
+#### 🤖 Option 2: Interactive Setup (With AI Features)
+**Perfect for: Users who want AI-powered error recovery**
+```bash
+curl -O https://raw.githubusercontent.com/Joynul-Abedin/Flutter-Pod/main/setup_flutter_env.sh
+chmod +x setup_flutter_env.sh
+./setup_flutter_env.sh
+```
+
+#### ⚡ Option 3: Pre-configured AI (For Power Users)
+**Perfect for: Automation and scripts with AI features**
+```bash
+export OPENROUTER_API_KEY="your-key-here"
+curl -fsSL https://raw.githubusercontent.com/Joynul-Abedin/Flutter-Pod/main/setup_flutter_env.sh | bash
+```
+
+### 🪟 Windows PowerShell (Run as Administrator)
+
+#### 🔥 Option 1: Quick Install (Fastest)
+**Perfect for: Fast setup without interactive prompts**
+```powershell
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/Joynul-Abedin/Flutter-Pod/main/setup_flutter_env.ps1" -OutFile "setup.ps1"; .\setup.ps1; Remove-Item setup.ps1
+```
+
+#### 🤖 Option 2: Interactive Setup (With AI Features)
+**Perfect for: Users who want AI-powered error recovery**
+```powershell
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/Joynul-Abedin/Flutter-Pod/main/setup_flutter_env.ps1" -OutFile "setup_flutter_env.ps1"
+.\setup_flutter_env.ps1
+```
+
+#### ⚡ Option 3: Pre-configured AI (For Power Users)
+**Perfect for: Automation and scripts with AI features**
+```powershell
+$env:OPENROUTER_API_KEY="your-key-here"
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/Joynul-Abedin/Flutter-Pod/main/setup_flutter_env.ps1" -OutFile "setup.ps1"; .\setup.ps1; Remove-Item setup.ps1
+```
+
+> **💡 Need an API key?** Get a free one at [openrouter.ai](https://openrouter.ai) for AI-powered error recovery!
+
 ## 🌟 Features
 
 - **🔥 One-Click Setup**: Complete Flutter environment installation
@@ -10,34 +59,6 @@ Cross-platform Flutter development environment setup with AI-powered error recov
 - **🌍 Cross-Platform**: Works on macOS, Linux, and Windows
 - **⚡ Smart Detection**: Skips already installed components
 - **🛡️ Self-Healing**: Automatic retry with AI-guided fixes
-
-## 🚀 Quick Start
-
-### macOS & Linux
-
-```bash
-# Quick install (basic setup, no interactive prompts)
-curl -fsSL https://raw.githubusercontent.com/Joynul-Abedin/Flutter-Pod/main/setup_flutter_env.sh | bash
-
-# Interactive setup (with AI key prompting)
-curl -O https://raw.githubusercontent.com/Joynul-Abedin/Flutter-Pod/main/setup_flutter_env.sh
-chmod +x setup_flutter_env.sh
-./setup_flutter_env.sh
-
-# With AI features enabled
-export OPENROUTER_API_KEY="your-key-here"
-curl -fsSL https://raw.githubusercontent.com/Joynul-Abedin/Flutter-Pod/main/setup_flutter_env.sh | bash
-```
-
-### Windows PowerShell
-
-```powershell
-# Download and run
-Invoke-WebRequest -Uri "https://raw.githubusercontent.com/Joynul-Abedin/Flutter-Pod/main/setup_flutter_env.ps1" -OutFile "setup_flutter_env.ps1"
-.\setup_flutter_env.ps1
-
-# Run as Administrator for best results
-```
 
 ## 🛠️ What Gets Installed
 
@@ -62,45 +83,7 @@ The scripts include optional intelligent error recovery that automatically:
 3. **Applies Fixes**: Automatically resolves dependency issues
 4. **Continues Setup**: Seamlessly resumes installation
 
-### 🔑 Enable AI Features (Optional)
-
-For enhanced error recovery, you can enable AI assistance:
-
-#### Option 1: Interactive Setup
-Download and run the script directly for interactive API key prompting:
-```bash
-# macOS/Linux
-curl -O https://raw.githubusercontent.com/Joynul-Abedin/Flutter-Pod/main/setup_flutter_env.sh
-chmod +x setup_flutter_env.sh
-./setup_flutter_env.sh
-
-# Windows
-Invoke-WebRequest -Uri "https://raw.githubusercontent.com/Joynul-Abedin/Flutter-Pod/main/setup_flutter_env.ps1" -OutFile "setup_flutter_env.ps1"
-.\setup_flutter_env.ps1
-```
-
-#### Option 2: Environment Variable
-```bash
-# Get free API key from https://openrouter.ai
-export OPENROUTER_API_KEY="your-api-key-here"
-
-# macOS/Linux
-./setup_flutter_env.sh
-
-# Windows PowerShell
-$env:OPENROUTER_API_KEY="your-api-key-here"
-.\setup_flutter_env.ps1
-```
-
-#### Option 3: Quick Install (No AI)
-For fastest setup without AI features, use the one-liner:
-```bash
-# macOS/Linux
-curl -fsSL https://raw.githubusercontent.com/Joynul-Abedin/Flutter-Pod/main/setup_flutter_env.sh | bash
-
-# Windows PowerShell (run as Admin)
-Invoke-WebRequest -Uri "https://raw.githubusercontent.com/Joynul-Abedin/Flutter-Pod/main/setup_flutter_env.ps1" -OutFile "setup.ps1"; .\setup.ps1; Remove-Item setup.ps1
-```
+Choose **Option 2** or **Option 3** from the Quick Start section above to enable AI features.
 
 ### Visual Progress Experience
 ```
